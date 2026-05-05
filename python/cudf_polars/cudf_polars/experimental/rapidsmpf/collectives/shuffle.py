@@ -235,9 +235,8 @@ async def _global_shuffle(
     """
     # For Col-only keys derive column indices so we can check whether
     # the data is already correctly partitioned and skip the shuffle.
-    key_values = [ne.value for ne in keys_to_hash]
     col_indices: tuple[int, ...] | None = None
-    if all(isinstance(k, Col) for k in key_values):
+    if all(isinstance(k.value, Col) for k in keys_to_hash):
         col_indices = names_to_indices(keys_to_hash, child_ir.schema)
 
     metadata_in = await recv_metadata(ch_in, context)
