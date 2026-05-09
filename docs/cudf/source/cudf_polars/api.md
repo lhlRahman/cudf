@@ -63,4 +63,6 @@ Most users interact with them through `StreamingOptions` fields rather than dire
       DynamicPlanningOptions,
       MemoryResourceConfig,
       ParquetOptions,
+      StreamingExecutor,
+      StreamingFallbackMode,
 ```
