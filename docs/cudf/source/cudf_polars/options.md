@@ -2,7 +2,7 @@
 # Configuration Options
 
 {class}`~cudf_polars.experimental.rapidsmpf.frontend.options.StreamingOptions` is the recommended
-way to configure the streaming multi-GPU engines. Build one and pass it to `RayEngine.from_options()`
+way to configure the streaming engines. Build one and pass it to `RayEngine.from_options()`
 to construct a {class}`~cudf_polars.experimental.rapidsmpf.frontend.ray.RayEngine`:
 
 ```python
@@ -24,6 +24,15 @@ with RayEngine.from_options(opts) as engine:
           .agg(pl.col("amount").sum())
           .collect(engine=engine)
     )
+```
+
+```{note}
+{class}`~cudf_polars.experimental.rapidsmpf.frontend.default_singleton_engine.DefaultSingletonEngine`,
+the implicit fallback when no engine is constructed, accepts no
+{class}`~cudf_polars.experimental.rapidsmpf.frontend.options.StreamingOptions`. Many of the
+fields below have a noticeable runtime impact (for example `spill_to_pinned_memory=True`
+significantly speeds up spill-heavy workflows), so to use any non-default value construct one
+of the engines listed below.
 ```
 
 {class}`~cudf_polars.experimental.rapidsmpf.frontend.options.StreamingOptions` covers three

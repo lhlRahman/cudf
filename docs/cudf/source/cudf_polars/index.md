@@ -8,7 +8,8 @@ on the GPU. If it is not, the execution transparently falls back to the standard
 and runs on the CPU.
 
 `cudf-polars` ships multiple engine implementation: a simple in-memory path and several
-streaming engines that scale past device memory across multiple GPUs and nodes. See
+streaming engines (Ray, Dask, SPMD) that scale past device memory across multiple GPUs and
+nodes, plus an implicit default for users who don't construct one explicitly. See
 {doc}`engines` for a conceptual overview, and {doc}`usage` to get started.
 
 ## Benchmark
@@ -55,7 +56,6 @@ options
 profiling
 other_engines
 api
-legacy
 ```
 
 ## Launch on Google Colab

@@ -5,6 +5,10 @@
 an `engine=` argument to `.collect()` or `.sink_*()`. See {doc}`engines` for the conceptual
 picture; this page walks through running your first query.
 
+We recommend constructing an engine explicitly even on a single GPU, the engine constructor
+is where you specify {class}`~cudf_polars.experimental.rapidsmpf.frontend.options.StreamingOptions`
+such as `spill_to_pinned_memory` or `fallback_mode`.
+
 ## Your first GPU query
 
 ```python
@@ -45,6 +49,14 @@ result = query.collect(engine="gpu")
 This is the path documented in Polars' own [GPU support guide][polars-gpu]. It runs entirely
 in device memory on a single GPU; it does not stream or distribute. See {doc}`engines` for
 a comparison with the streaming engines.
+
+For convenience scripts and notebooks, you can also write
+`query.collect(engine=pl.GPUEngine(executor="streaming"))` without constructing an engine,
+cudf-polars will use an implicit
+{class}`~cudf_polars.experimental.rapidsmpf.frontend.default_singleton_engine.DefaultSingletonEngine`.
+This trades configurability (the singleton takes no options, so e.g. `spill_to_pinned_memory`
+is fixed at its default) for one-line setup. For anything beyond a quick script, construct an
+explicit engine as shown above. See {doc}`default_singleton_engine`.
 
 [polars-gpu]: https://docs.pola.rs/user-guide/gpu-support/
 

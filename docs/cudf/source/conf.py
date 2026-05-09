@@ -665,6 +665,11 @@ nitpick_ignore_regex = [
     ("py:.*", r"ray(\..*)?"),
     ("py:.*", r"distributed(\..*)?"),
     ("py:.*", r"dask_cuda(\..*)?"),
+    # TODO: removed before merging this PR, it depends on https://github.com/rapidsai/cudf/pull/22410
+    (
+        "py:.*",
+        r"cudf_polars\.experimental\.rapidsmpf\.frontend\.default_singleton_engine(\..*)?",
+    ),
 ]
 
 # The cudf_polars streaming-engine modules depend on optional runtime libs

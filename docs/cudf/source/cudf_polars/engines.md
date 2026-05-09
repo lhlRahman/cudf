@@ -46,6 +46,15 @@ GPU workers is provisioned and coordinated:
 All three approaches use the same execution model under the hood, so which to select depends
 on your preferred deployment method, not performance tradeoffs.
 
+```{note}
+When the user has not constructed any of the engines above and writes
+`pl.GPUEngine(executor="streaming")`, cudf-polars uses an implicit
+{class}`~cudf_polars.experimental.rapidsmpf.frontend.default_singleton_engine.DefaultSingletonEngine`.
+This bootstraps a single-GPU streaming runtime on first use and reuses it across queries. We
+recommend constructing an explicit engine for any non-trivial workflow, the singleton accepts
+no options. See {doc}`default_singleton_engine`.
+```
+
 ## Where to go next
 
 - {doc}`usage` — tutorial that walks through running your first GPU query end-to-end.

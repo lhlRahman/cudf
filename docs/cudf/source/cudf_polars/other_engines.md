@@ -2,13 +2,17 @@
 # Other Engines
 
 The examples in {doc}`usage` use
-{class}`~cudf_polars.experimental.rapidsmpf.frontend.ray.RayEngine`. `cudf-polars` ships two
-other streaming engines that run the same streaming executor and produce equivalent results:
+{class}`~cudf_polars.experimental.rapidsmpf.frontend.ray.RayEngine`. The pages below cover
+other ways to run cudf-polars:
 
 * **{doc}`dask_engine`** — runs on a [Dask distributed][dask] cluster with one Dask worker per
   GPU. Use this when you already have a Dask deployment or a preferred Dask launcher.
 * **{doc}`spmd_engine`** — single program, multiple data: the same script runs once per GPU,
   typically launched with `rrun`. Single-rank mode needs no external cluster at all.
+* **{doc}`default_singleton_engine`** — the implicit fallback used when no engine is
+  constructed explicitly (e.g. `pl.GPUEngine(executor="streaming")` with no cluster). Useful
+  to *understand*; for any non-trivial workflow we recommend constructing an explicit engine
+  so you can pass {class}`~cudf_polars.experimental.rapidsmpf.frontend.options.StreamingOptions`.
 
 See {doc}`engines` for the conceptual comparison with `RayEngine` (cluster model, runtime
 dependencies, typical use), and {doc}`options` for the shared
@@ -20,6 +24,7 @@ dependencies, typical use), and {doc}`options` for the shared
 
 dask_engine
 spmd_engine
+default_singleton_engine
 ```
 
 [dask]: https://distributed.dask.org/

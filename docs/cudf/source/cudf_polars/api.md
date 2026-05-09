@@ -19,6 +19,10 @@ multi-GPU engines.
 .. autoclass:: cudf_polars.experimental.rapidsmpf.frontend.spmd.SPMDEngine
    :members: from_options, gather_cluster_info, gather_statistics, global_statistics, shutdown, nranks, rank, comm, context
    :show-inheritance:
+
+.. autoclass:: cudf_polars.experimental.rapidsmpf.frontend.default_singleton_engine.DefaultSingletonEngine
+   :members: create_or_get, shutdown
+   :show-inheritance:
 ```
 
 The three engines share a common base class:
