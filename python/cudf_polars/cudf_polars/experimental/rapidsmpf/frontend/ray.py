@@ -449,6 +449,7 @@ class RayEngine(StreamingEngine):
         Hardware binding is disabled implicitly but the caller must
         pass ``engine_options={"allow_gpu_sharing": True}`` explicitly
         to acknowledge the multi-tenant GPU semantics.
+
         .. note::
             Oversubscription does not increase throughput. When multiple
             ranks share a GPU, they compete for the same compute and

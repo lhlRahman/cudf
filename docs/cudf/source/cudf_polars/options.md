@@ -119,14 +119,13 @@ See the [RapidsMPF configuration reference][rapidsmpf-config] for the full list 
 
 | Field                    | Description                                                                                                         | Default                      |
 |--------------------------|---------------------------------------------------------------------------------------------------------------------|------------------------------|
-| `num_py_executors`       | Hint for the size of the internal Python `ThreadPoolExecutor`. The actual thread count is decided by `asyncio` and is not guaranteed to match. | `8` |
-| `fallback_mode`          | When an unsupported operation forces a fallback to CPU execution: `"warn"`, `"raise"`, `"silent"`.                  | `"warn"`                     |
-| `max_rows_per_partition` | Maximum number of rows per partition.                                                                               | `1_000_000`                  |
-| `broadcast_join_limit`   | Maximum number of partitions for broadcast joins.                                                                   | auto                         |
-| `target_partition_size`  | Target I/O partition size in bytes. `0` means auto.                                                                 | auto                         |
-| `dynamic_planning`       | Dynamic planning configuration, dict or {class}`~cudf_polars.utils.config.DynamicPlanningOptions`. `None` disables. | enabled                      |
-| `unique_fraction`        | Per-column uniqueness estimate (0–1).                                                                               | `{}` (i.e. `1.0` per column) |
-| `sink_to_directory`      | Whether `.sink_*()` writes its output as a directory. Currently, only `True` is supported (see [Sink behavior](usage.md#sink-behavior)). | `True`  |
+| `num_py_executors`       | Workers for the internal Python `ThreadPoolExecutor`.                                                                                                              | `8`                          |
+| `fallback_mode`          | When an unsupported operation forces a fallback to CPU execution: `"warn"`, `"raise"`, `"silent"`.                                                                 | `"warn"`                     |
+| `max_rows_per_partition` | Maximum number of rows per partition.                                                                                                                              | `1_000_000`                  |
+| `broadcast_join_limit`   | Maximum number of partitions for broadcast joins.                                                                                                                  | auto                         |
+| `target_partition_size`  | Target I/O partition size in bytes. `0` means auto.                                                                                                                | auto                         |
+| `dynamic_planning`       | Dynamic planning configuration, dict or {class}`~cudf_polars.utils.config.DynamicPlanningOptions`. `None` disables.                                                | enabled                      |
+| `sink_to_directory`      | Whether `.sink_*()` writes its output as a directory. The `spmd`, `ray`, and `dask` engines always use `True`; passing `False` raises `ValueError`.                | `True`                       |
 
 ### Category: `engine`
 

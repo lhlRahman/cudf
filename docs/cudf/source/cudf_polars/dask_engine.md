@@ -64,6 +64,7 @@ with Client("scheduler-address:8786") as dc:
 When you supply the client, {class}`~cudf_polars.experimental.rapidsmpf.frontend.dask.DaskEngine`
 leaves it (and the cluster) alone on exit.
 
+(pre-configured-gpu-clusters)=
 ### Pre-configured GPU clusters
 
 Some Dask launchers, notably `dask_cuda.LocalCUDACluster`, already pin CPU affinity and set

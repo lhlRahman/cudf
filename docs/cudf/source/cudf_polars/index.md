@@ -7,7 +7,7 @@ converts expressions into an optimized query plan and determines whether the pla
 on the GPU. If it is not, the execution transparently falls back to the standard Polars engine
 and runs on the CPU.
 
-`cudf-polars` ships multiple engine implementation: a simple in-memory path and several
+`cudf-polars` ships multiple engine implementations: a simple in-memory path and several
 streaming engines (Ray, Dask, SPMD) that scale past device memory across multiple GPUs and
 nodes, plus an implicit default for users who don't construct one explicitly. See
 {doc}`engines` for a conceptual overview, and {doc}`usage` to get started.

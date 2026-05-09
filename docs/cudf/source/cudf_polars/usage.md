@@ -34,7 +34,7 @@ Ray cluster if one is already running (see [Attaching to an existing Raycluster]
 
 ```{note}
 The examples on this page use {class}`~cudf_polars.experimental.rapidsmpf.frontend.ray.RayEngine`. `cudf-polars` supports
-multiple engines for GPU execution. Ssee {doc}`other_engines` for alternatives, or {doc}`engines` for a conceptual overview of when to pick which.
+multiple engines for GPU execution. See {doc}`other_engines` for alternatives, or {doc}`engines` for a conceptual overview of when to pick which.
 ```
 
 ## Simpler alternative: the in-memory GPU engine
@@ -50,9 +50,8 @@ This is the path documented in Polars' own [GPU support guide][polars-gpu]. It r
 in device memory on a single GPU; it does not stream or distribute. See {doc}`engines` for
 a comparison with the streaming engines.
 
-For convenience scripts and notebooks, you can also write
-`query.collect(engine=pl.GPUEngine(executor="streaming"))` without constructing an engine,
-cudf-polars will use an implicit
+For convenience scripts and notebooks, you can also write `query.collect(engine="gpu"))` without
+constructing an engine, cudf-polars will use an implicit
 {class}`~cudf_polars.experimental.rapidsmpf.frontend.default_singleton_engine.DefaultSingletonEngine`.
 This trades configurability (the singleton takes no options, so e.g. `spill_to_pinned_memory`
 is fixed at its default) for one-line setup. For anything beyond a quick script, construct an

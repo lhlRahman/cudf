@@ -67,7 +67,7 @@ The result is a tuple containing 2 materialized DataFrames - the first with the 
 ```python
 print(profile[0])
 ```
-```
+```text
 shape: (32_439_327, 19)
 ┌──────────┬──────────────────────┬───────────────────────┬─────────────────┬───┬───────────────────────┬──────────────┬──────────────────────┬─────────────┐
 │ VendorID ┆ tpep_pickup_datetime ┆ tpep_dropoff_datetime ┆ passenger_count ┆ … ┆ improvement_surcharge ┆ total_amount ┆ congestion_surcharge ┆ Airport_fee │
@@ -91,7 +91,7 @@ shape: (32_439_327, 19)
 ```python
 print(profile[1])
 ```
-```
+```text
 shape: (3, 3)
 ┌────────────────────┬───────┬────────┐
 │ node               ┆ start ┆ end    │
@@ -179,13 +179,13 @@ Setting `CUDF_POLARS_LOG_TRACES=1` enables all the metrics. Depending on the que
 from collecting the memory or dataframe metrics can be measurable. You can disable some metrics
 through additional environment variables. For example, to disable the memory related metrics, set:
 
-```
+```bash
 CUDF_POLARS_LOG_TRACES=1 CUDF_POLARS_LOG_TRACES_MEMORY=0
 ```
 
 And to disable the memory and dataframe metrics, which essentially leaves just the duration
 metrics, set
-```
+```bash
 CUDF_POLARS_LOG_TRACES=1 CUDF_POLARS_LOG_TRACES_MEMORY=0 CUDF_POLARS_LOG_TRACES_DATAFRAMES=0
 ```
 
@@ -195,7 +195,7 @@ The implementation uses [structlog] to build log records. You can configure the 
 structlog's [configuration][structlog-configure] and enrich the records with
 [context variables][structlog-context].
 
-```
+```python
 >>> df = pl.DataFrame({"a": ["a", "a", "b"], "b": [1, 2, 3]}).lazy()
 >>> df.group_by("a").agg(pl.col("b").min().alias("min"), pl.col("b").max().alias("max")).collect(engine="gpu")
 2025-09-10 07:44:01 [info     ] Execute IR      count_frames_input=0 count_frames_output=1 ... type=DataFrameScan

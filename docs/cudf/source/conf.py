@@ -636,13 +636,18 @@ nitpick_ignore = [
     ("py:class", "Axis"),
     ("py:class", "ArrowLike"),
     ("py:class", "ExecutorType"),
-    # cudf-polars: unqualified refs in autodoc'd docstrings.
+    # cudf-polars: unqualified refs in autodoc'd docstrings. These names appear
+    # in type annotations / cross-references inside the rapidsmpf-frontend
+    # modules. They cannot be resolved automatically because their definitions
+    # live behind ``if TYPE_CHECKING:`` imports or in third-party packages
+    # mocked via ``autodoc_mock_imports``.
     ("py:class", "StreamingOptions"),
     ("py:class", "ClusterInfo"),
     ("py:class", "RankActor"),
     ("py:class", "ActorHandle"),
     ("py:class", "Communicator"),
     ("py:class", "Options"),
+    ("py:class", "Statistics"),
     ("py:func", "reserve_op_id"),
     ("py:func", "bind_to_gpu"),
     ("py:attr", "HardwareBindingPolicy.skip_under_rrun"),
@@ -651,6 +656,7 @@ nitpick_ignore = [
         "cudf_polars.experimental.rapidsmpf.frontend.hardware_binding.bind_to_gpu",
     ),
     # polars aliases that don't match the public intersphinx targets.
+    ("py:class", "pl.DataFrame"),
     ("py:class", "polars.LazyFrame"),
     ("py:class", "polars.DataFrame"),
     ("py:class", "polars.dataframe.frame.DataFrame"),
@@ -665,7 +671,9 @@ nitpick_ignore_regex = [
     ("py:.*", r"ray(\..*)?"),
     ("py:.*", r"distributed(\..*)?"),
     ("py:.*", r"dask_cuda(\..*)?"),
-    # TODO: removed before merging this PR, it depends on https://github.com/rapidsai/cudf/pull/22410
+    # ``DefaultSingletonEngine`` is introduced by
+    # https://github.com/rapidsai/cudf/pull/22410. That PR must merge BEFORE
+    # this docs-overhaul PR; remove this entry once it has.
     (
         "py:.*",
         r"cudf_polars\.experimental\.rapidsmpf\.frontend\.default_singleton_engine(\..*)?",
@@ -686,7 +694,7 @@ try:
     import cudf_polars.experimental.rapidsmpf.frontend.hardware_binding
     import cudf_polars.experimental.rapidsmpf.frontend.options
     import cudf_polars.experimental.rapidsmpf.frontend.ray
-    import cudf_polars.experimental.rapidsmpf.frontend.spmd  # noqa: F401
+    import cudf_polars.experimental.rapidsmpf.frontend.spmd
 except Exception:
     nitpick_ignore_regex.append(
         ("py:.*", r"cudf_polars\.experimental\.rapidsmpf\..*")
@@ -761,7 +769,23 @@ suppress_warnings = ["myst.domains"]
 # without rapidsmpf/ray/etc.), autodoc emits one import warning per
 # directive. Suppress those so the build survives; the dangling xrefs are
 # handled via nitpick_ignore_regex above.
-if not _cudf_polars_rapidsmpf_importable:
+#
+# ``DefaultSingletonEngine`` is introduced by
+# https://github.com/rapidsai/cudf/pull/22410. That PR must merge BEFORE
+# this docs-overhaul PR; while it is absent, autodoc emits an
+# import_object warning for the autoclass directive in ``api.md``.
+# Suppress that warning here. Drop this probe once #22410 has merged.
+try:
+    import cudf_polars.experimental.rapidsmpf.frontend.default_singleton_engine  # noqa: F401
+except Exception:
+    _default_singleton_engine_importable = False
+else:
+    _default_singleton_engine_importable = True
+
+if (
+    not _cudf_polars_rapidsmpf_importable
+    or not _default_singleton_engine_importable
+):
     suppress_warnings.append("autodoc.import_object")
 
 
