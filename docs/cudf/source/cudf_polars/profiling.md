@@ -41,10 +41,12 @@ useful when you want to scope statistics to a single query.
 
 Use `global_statistics(*, clear=False)` when you only need the cluster-wide picture. It gathers
 and merges the per-rank statistics into a single `Statistics` (counts and values summed, maxima
-reduced with `max`):
+reduced with `max`). Capture it inside the engine context, then print after exit:
 
 ```python
-total = engine.global_statistics(clear=True)
+with RayEngine.from_options(opts) as engine:
+    result = pl.scan_parquet("/data/*.parquet").collect(engine=engine)
+    total = engine.global_statistics(clear=True)
 print(total)
 ```
 

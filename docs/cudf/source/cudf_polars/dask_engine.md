@@ -74,12 +74,14 @@ to avoid having both layers fight over each worker's affinity (the second to run
 makes the resulting placement non-deterministic):
 
 ```python
+from dask_cuda import LocalCUDACluster
+from distributed import Client
 from cudf_polars.experimental.rapidsmpf.frontend.dask import DaskEngine
 from cudf_polars.experimental.rapidsmpf.frontend.hardware_binding import (
     HardwareBindingPolicy,
 )
 
-with DaskEngine(
+with Client(LocalCUDACluster()) as dc, DaskEngine(
     dask_client=dc,
     engine_options={
         "hardware_binding": HardwareBindingPolicy(enabled=False),
@@ -103,12 +105,13 @@ dask worker SCHEDULER_ADDRESS:8786 --nworkers N --nthreads 1 \
 Then connect from the client:
 
 ```python
+import polars as pl
 from distributed import Client
 from cudf_polars.experimental.rapidsmpf.frontend.dask import DaskEngine
 
 with Client("SCHEDULER_ADDRESS:8786") as dc:
     with DaskEngine(dask_client=dc) as engine:
-        result = lf.collect(engine=engine)
+        result = pl.scan_parquet("/data/*.parquet").collect(engine=engine)
 ```
 
 Hardware binding (CPU affinity, NUMA, network) is handled automatically by
@@ -147,6 +150,7 @@ dask-cuda-worker SCHEDULER_ADDRESS:8786
 ```
 
 ```python
+import polars as pl
 from distributed import Client
 from cudf_polars.experimental.rapidsmpf.frontend.dask import DaskEngine
 from cudf_polars.experimental.rapidsmpf.frontend.hardware_binding import (
@@ -162,7 +166,7 @@ with Client("SCHEDULER_ADDRESS:8786") as dc:
             "hardware_binding": HardwareBindingPolicy(enabled=False),
         },
     ) as engine:
-        result = lf.collect(engine=engine)
+        result = pl.scan_parquet("/data/*.parquet").collect(engine=engine)
 ```
 
 ## Cluster diagnostics
