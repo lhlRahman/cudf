@@ -1,14 +1,16 @@
 (cudf-polars-profiling)=
 # Profiling and Tracing
 
-## RapidsMPF Statistics
+## Streaming Statistics
 
 When a query runs on a streaming engine
 ({class}`~cudf_polars.experimental.rapidsmpf.frontend.ray.RayEngine`,
-{class}`~cudf_polars.experimental.rapidsmpf.frontend.dask.DaskEngine`, or
-{class}`~cudf_polars.experimental.rapidsmpf.frontend.spmd.SPMDEngine`), the underlying RapidsMPF
-runtime can record detailed per-rank statistics: shuffle byte counts, allgather participation,
-memory-pool high-water marks, and more. See the [RapidsMPF statistics reference][rapidsmpf-stats] for the full list of metrics.
+{class}`~cudf_polars.experimental.rapidsmpf.frontend.dask.DaskEngine`,
+{class}`~cudf_polars.experimental.rapidsmpf.frontend.spmd.SPMDEngine`, or the implicit
+{class}`~cudf_polars.experimental.rapidsmpf.frontend.default_singleton_engine.DefaultSingletonEngine`),
+the underlying streaming runtime can record detailed per-rank statistics: shuffle byte counts,
+allgather participation, memory-pool high-water marks, and more. See the
+[underlying statistics reference][rapidsmpf-stats] for the full list of metrics.
 
 Statistics collection is off by default. Enable it by setting `statistics=True` on
 {class}`~cudf_polars.experimental.rapidsmpf.frontend.options.StreamingOptions` (or exporting
@@ -53,11 +55,12 @@ print(total)
 
 ## GPU Profiling
 
-The streaming engines do not support profiling query execution through the `LazyFrame.profile`
-method. We recommend profiling streaming queries with [NVIDIA NSight Systems][nsight];
-`cudf-polars` includes [nvtx][nvtx] annotations to help you understand where time is being spent.
+For streaming queries, we recommend profiling with [NVIDIA NSight Systems][nsight]; `cudf-polars`
+includes [nvtx][nvtx] annotations to help you understand where time is being spent. Streaming
+engines do not support `LazyFrame.profile`, since `profile` requires a single in-memory pass.
 
-The in-memory engine *does* support [`LazyFrame.profile`](https://docs.pola.rs/api/python/stable/reference/lazyframe/api/polars.LazyFrame.profile.html):
+If you specifically need [`LazyFrame.profile`](https://docs.pola.rs/api/python/stable/reference/lazyframe/api/polars.LazyFrame.profile.html),
+the in-memory engine supports it. This is useful for small queries during development:
 
 ```python
 import polars as pl
@@ -65,46 +68,7 @@ q = pl.scan_parquet("ny-taxi/2024/*.parquet").filter(pl.col("total_amount") > 15
 profile = q.profile(engine=pl.GPUEngine(executor="in-memory"))
 ```
 
-The result is a tuple containing 2 materialized DataFrames - the first with the query result and the second with profiling information of each node that is executed.
-```python
-print(profile[0])
-```
-```text
-shape: (32_439_327, 19)
-┌──────────┬──────────────────────┬───────────────────────┬─────────────────┬───┬───────────────────────┬──────────────┬──────────────────────┬─────────────┐
-│ VendorID ┆ tpep_pickup_datetime ┆ tpep_dropoff_datetime ┆ passenger_count ┆ … ┆ improvement_surcharge ┆ total_amount ┆ congestion_surcharge ┆ Airport_fee │
-│ ---      ┆ ---                  ┆ ---                   ┆ ---             ┆   ┆ ---                   ┆ ---          ┆ ---                  ┆ ---         │
-│ i32      ┆ datetime[μs]         ┆ datetime[μs]          ┆ i64             ┆   ┆ f64                   ┆ f64          ┆ f64                  ┆ f64         │
-╞══════════╪══════════════════════╪═══════════════════════╪═════════════════╪═══╪═══════════════════════╪══════════════╪══════════════════════╪═════════════╡
-│ 2        ┆ 2024-01-01 00:57:55  ┆ 2024-01-01 01:17:43   ┆ 1               ┆ … ┆ 1.0                   ┆ 22.7         ┆ 2.5                  ┆ 0.0         │
-│ 1        ┆ 2024-01-01 00:03:00  ┆ 2024-01-01 00:09:36   ┆ 1               ┆ … ┆ 1.0                   ┆ 18.75        ┆ 2.5                  ┆ 0.0         │
-│ 1        ┆ 2024-01-01 00:17:06  ┆ 2024-01-01 00:35:01   ┆ 1               ┆ … ┆ 1.0                   ┆ 31.3         ┆ 2.5                  ┆ 0.0         │
-│ 1        ┆ 2024-01-01 00:36:38  ┆ 2024-01-01 00:44:56   ┆ 1               ┆ … ┆ 1.0                   ┆ 17.0         ┆ 2.5                  ┆ 0.0         │
-│ 1        ┆ 2024-01-01 00:46:51  ┆ 2024-01-01 00:52:57   ┆ 1               ┆ … ┆ 1.0                   ┆ 16.1         ┆ 2.5                  ┆ 0.0         │
-│ …        ┆ …                    ┆ …                     ┆ …               ┆ … ┆ …                     ┆ …            ┆ …                    ┆ …           │
-│ 2        ┆ 2024-12-31 23:05:43  ┆ 2024-12-31 23:18:15   ┆ null            ┆ … ┆ 1.0                   ┆ 24.67        ┆ null                 ┆ null        │
-│ 2        ┆ 2024-12-31 23:02:00  ┆ 2024-12-31 23:22:14   ┆ null            ┆ … ┆ 1.0                   ┆ 15.25        ┆ null                 ┆ null        │
-│ 2        ┆ 2024-12-31 23:17:15  ┆ 2024-12-31 23:17:34   ┆ null            ┆ … ┆ 1.0                   ┆ 24.46        ┆ null                 ┆ null        │
-│ 1        ┆ 2024-12-31 23:14:53  ┆ 2024-12-31 23:35:13   ┆ null            ┆ … ┆ 1.0                   ┆ 32.88        ┆ null                 ┆ null        │
-│ 1        ┆ 2024-12-31 23:15:33  ┆ 2024-12-31 23:36:29   ┆ null            ┆ … ┆ 1.0                   ┆ 28.57        ┆ null                 ┆ null        │
-└──────────┴──────────────────────┴───────────────────────┴─────────────────┴───┴───────────────────────┴──────────────┴──────────────────────┴─────────────┘
-```
-
-```python
-print(profile[1])
-```
-```text
-shape: (3, 3)
-┌────────────────────┬───────┬────────┐
-│ node               ┆ start ┆ end    │
-│ ---                ┆ ---   ┆ ---    │
-│ str                ┆ u64   ┆ u64    │
-╞════════════════════╪═══════╪════════╡
-│ optimization       ┆ 0     ┆ 416    │
-│ gpu-ir-translation ┆ 416   ┆ 741    │
-│ Scan               ┆ 813   ┆ 233993 │
-└────────────────────┴───────┴────────┘
-```
+The result is `(result_df, timings_df)`; see the Polars docs link above for the schema.
 
 ## Tracing
 
@@ -116,13 +80,13 @@ cudf-polars logs traces at three scopes (levels):
 
 1. `plan`: These generally happen once per query. This will include things like the (serialized)
    query plan.
-2. `actor`: (rapidsmpf runtime only). There will be roughly one `actor` trace per node in the
+2. `actor`: (streaming engines only). There will be roughly one `actor` trace per node in the
    logical plan.
 3. `evaluate_ir_node`: Logs the evaluation of a physical node in the query plan. Note that one
    logical node might expand to more than one physical nodes.
 
 Each trace includes a `scope` key indicating which level that trace belongs to. `actor`-scoped
-nodes will be nested under a `plan`-scoped node. When using the rapidsmpf runtime,
+nodes will be nested under a `plan`-scoped node. When using a streaming engine,
 `evaluate_ir_node`-scoped nodes will be nested under an `actor`-scoped node.
 
 ### Schemas
@@ -140,7 +104,7 @@ The different scopes have different schemas. Fields in **bold** are required / a
 
 #### scope=actor
 
-`actor`-scoped traces will only appear with the rapidsmpf runtime.
+`actor`-scoped traces only appear when running on a streaming engine.
 
 | Field Name | Type  | Description |
 | ---------- | ----- | ----------- |
@@ -175,7 +139,7 @@ The different scopes have different schemas. Fields in **bold** are required / a
 | `rmm_total_bytes_{phase}` | int | The total number of bytes allocated by RMM Memory Resource used by cudf-polars for the input / output `phase`. This metric can be disabled by setting `CUDF_POLARS_LOG_TRACES_MEMORY=0`. |
 | `rmm_total_count_{phase}` | int | The total number of allocations made by RMM Memory Resource used by cudf-polars for the input / output `phase`. This metric can be disabled by setting `CUDF_POLARS_LOG_TRACES_MEMORY=0`. |
 | `nvml_current_bytes_{phase}` | int | The device memory usage of this process, as reported by NVML, for the input / output `phase`. This metric can be disabled by setting `CUDF_POLARS_LOG_TRACES_MEMORY=0`. |
-| actor_ir_id   | int    | A unique identifier for the parent actor (rapidsmpf runtime only). |
+| actor_ir_id   | int    | A unique identifier for the parent actor (streaming engines only). |
 
 Setting `CUDF_POLARS_LOG_TRACES=1` enables all the metrics. Depending on the query, the overhead
 from collecting the memory or dataframe metrics can be measurable. You can disable some metrics
@@ -199,7 +163,7 @@ structlog's [configuration][structlog-configure] and enrich the records with
 
 ```python
 >>> df = pl.DataFrame({"a": ["a", "a", "b"], "b": [1, 2, 3]}).lazy()
->>> df.group_by("a").agg(pl.col("b").min().alias("min"), pl.col("b").max().alias("max")).collect(engine="gpu")
+>>> df.group_by("a").agg(pl.col("b").min().alias("min"), pl.col("b").max().alias("max")).collect(engine="in-memory")
 2025-09-10 07:44:01 [info     ] Execute IR      count_frames_input=0 count_frames_output=1 ... type=DataFrameScan
 2025-09-10 07:44:01 [info     ] Execute IR      count_frames_input=1 count_frames_output=1 ... type=GroupBy
 shape: (2, 3)

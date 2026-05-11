@@ -5,9 +5,10 @@
 an `engine=` argument to `.collect()` or `.sink_*()`. See {doc}`engines` for the conceptual
 picture; this page walks through running your first query.
 
-We recommend constructing an engine explicitly even on a single GPU, the engine constructor
-is where you specify {class}`~cudf_polars.experimental.rapidsmpf.frontend.options.StreamingOptions`
-such as `spill_to_pinned_memory` or `fallback_mode`.
+We recommend constructing an engine explicitly even on a single GPU. The engine constructor is
+where you specify {class}`~cudf_polars.experimental.rapidsmpf.frontend.options.StreamingOptions`
+such as `spill_to_pinned_memory` or `fallback_mode`. Ray is the showcased example below; see also
+{doc}`other_engines`.
 
 ## Your first GPU query
 
@@ -36,29 +37,6 @@ Ray cluster if one is already running (see [Attaching to an existing Raycluster]
 The examples on this page use {class}`~cudf_polars.experimental.rapidsmpf.frontend.ray.RayEngine`. `cudf-polars` supports
 multiple engines for GPU execution. See {doc}`other_engines` for alternatives, or {doc}`engines` for a conceptual overview of when to pick which.
 ```
-
-## Simpler alternative: the in-memory GPU engine
-
-If your data fits comfortably on one GPU and you don't need the streaming executor, you can use
-the in-memory path instead:
-
-```python
-result = query.collect(engine="gpu")
-```
-
-This is the path documented in Polars' own [GPU support guide][polars-gpu]. It runs entirely
-in device memory on a single GPU; it does not stream or distribute. See {doc}`engines` for
-a comparison with the streaming engines.
-
-For convenience scripts and notebooks, you can also write `query.collect(engine="gpu"))` without
-constructing an engine, cudf-polars will use an implicit
-{class}`~cudf_polars.experimental.rapidsmpf.frontend.default_singleton_engine.DefaultSingletonEngine`.
-This trades configurability (the singleton takes no options, so e.g. `spill_to_pinned_memory`
-is fixed at its default) for one-line setup. For anything beyond a quick script, construct an
-explicit engine as shown above. See {doc}`default_singleton_engine`.
-
-[polars-gpu]: https://docs.pola.rs/user-guide/gpu-support/
-
 
 ## Configuring `RayEngine`
 

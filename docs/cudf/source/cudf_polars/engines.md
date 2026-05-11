@@ -11,49 +11,58 @@ cluster backend coordinates those workers.
 
 ## Execution modes
 
-### In-memory
-
-`engine="gpu"` (or `engine=pl.GPUEngine()`) runs the query on a single GPU, materializing
-intermediates in device memory. This is the simplest path to get started, but cannot take
-advantage of multiple GPUs.
-
-Use this when the data fits comfortably in device memory. On GPUs with Unified Virtual Memory,
-cudf-polars can spill past device memory, but at a performance cost.
-
 ### Streaming
 
-Streaming engines partition their inputs (Parquet files or in-memory `DataFrame`s) and stream
-those partitions through the query graph. This lets queries scale past device memory, and, by
-distributing partitions across a cluster of GPU workers, across multiple GPUs and multiple
-nodes.
+Streaming engines partition their inputs (Parquet files or in-memory `DataFrame`s) and process
+those partitions through the query graph in chunks. This lets queries scale past device memory
+and (on Ray, Dask, and SPMD) across multiple GPUs and multiple nodes. cudf-polars' streaming
+executor is its own GPU implementation, but conceptually parallels
+[Polars' CPU streaming engine](https://docs.pola.rs/user-guide/concepts/streaming/): the same
+partition-and-stream model, just on the GPU.
 
+All four cudf-polars engines use this same streaming executor:
+{class}`~cudf_polars.experimental.rapidsmpf.frontend.ray.RayEngine`,
+{class}`~cudf_polars.experimental.rapidsmpf.frontend.dask.DaskEngine`,
+{class}`~cudf_polars.experimental.rapidsmpf.frontend.spmd.SPMDEngine`, and the implicit
+{class}`~cudf_polars.experimental.rapidsmpf.frontend.default_singleton_engine.DefaultSingletonEngine`.
+They differ only in how their GPU worker(s) are provisioned.
 {class}`~cudf_polars.experimental.rapidsmpf.frontend.ray.RayEngine` with no arguments uses every
 GPU visible to the process, so on a single node with N GPUs it runs the query on all N of them
 without any extra configuration. Launching a multi-node cluster simply means pointing the
 engine at that cluster; the user-facing code is the same.
 
-## Cluster backends
+### In-memory
 
-All streaming engines run the same streaming executor. They differ only in how the cluster of
-GPU workers is provisioned and coordinated:
-
-| Engine                                                                | Cluster model                                           | Runtime dependency              | Typical use                                                                   |
-| --------------------------------------------------------------------- | ------------------------------------------------------- | ------------------------------- | ----------------------------------------------------------------------------- |
-| {class}`~cudf_polars.experimental.rapidsmpf.frontend.ray.RayEngine`   | Single-client driver; one Ray actor per GPU             | [Ray][ray-docs]                 | Works from a laptop to a cloud cluster. No separate cluster setup needed.     |
-| {class}`~cudf_polars.experimental.rapidsmpf.frontend.dask.DaskEngine` | Single-client driver; one Dask worker per GPU           | [Dask distributed][dask]        | Teams with an existing Dask deployment or a preferred Dask launcher.          |
-| {class}`~cudf_polars.experimental.rapidsmpf.frontend.spmd.SPMDEngine` | Same script runs once per GPU, joined by a communicator | RapidsMPF (+ UCXX under `rrun`) | HPC / SPMD launchers such as `rrun`. Single-rank mode needs no cluster at all.|
-
-All three approaches use the same execution model under the hood, so which to select depends
-on your preferred deployment method, not performance tradeoffs.
+The in-memory engine (`engine="in-memory"` or `engine=pl.GPUEngine(executor="in-memory")`) is
+the only non-streaming path. It runs the query on a single GPU, materializing intermediates in
+device memory. Use it for small queries (data that fits in device memory), debugging, or when
+you specifically need `LazyFrame.profile` support (see {doc}`profiling`). For production
+workloads on any nontrivial dataset, use a streaming engine. See {doc}`in_memory_engine` for
+details.
 
 ```{note}
-When the user has not constructed any of the engines above and writes
-`pl.GPUEngine(executor="streaming")`, cudf-polars uses an implicit
-{class}`~cudf_polars.experimental.rapidsmpf.frontend.default_singleton_engine.DefaultSingletonEngine`.
-This bootstraps a single-GPU streaming runtime on first use and reuses it across queries. We
-recommend constructing an explicit engine for any non-trivial workflow, the singleton accepts
-no options. See {doc}`default_singleton_engine`.
+`engine="gpu"` and `engine=pl.GPUEngine()` no longer select the in-memory path. They use the
+implicit `DefaultSingletonEngine` (streaming, single-GPU). To pick the in-memory engine you
+must say so explicitly.
 ```
+
+## Cluster backends
+
+The four streaming engines differ only in how the GPU worker(s) are provisioned and
+coordinated:
+
+| Engine                                                                                                       | Cluster model                                                       | Extra runtime dependency | Typical use                                                                       |
+| ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------- | ------------------------ | --------------------------------------------------------------------------------- |
+| {class}`~cudf_polars.experimental.rapidsmpf.frontend.ray.RayEngine`                                          | Single-client driver; one Ray actor per GPU                         | [Ray][ray-docs]          | Works from a laptop to a cloud cluster. No separate cluster setup needed.         |
+| {class}`~cudf_polars.experimental.rapidsmpf.frontend.dask.DaskEngine`                                        | Single-client driver; one Dask worker per GPU                       | [Dask distributed][dask] | Teams with an existing Dask deployment or a preferred Dask launcher.              |
+| {class}`~cudf_polars.experimental.rapidsmpf.frontend.spmd.SPMDEngine`                                        | Same script runs once per GPU, joined by a communicator             | UCXX (under `rrun`)      | HPC / SPMD launchers such as `rrun`. Single-rank mode needs no cluster at all.    |
+| {class}`~cudf_polars.experimental.rapidsmpf.frontend.default_singleton_engine.DefaultSingletonEngine`        | Implicit process-wide singleton on one GPU; no cluster              | None                     | Default when no engine is constructed. Short scripts and notebooks. No options.   |
+
+All four approaches use the same execution model under the hood, so which to select depends
+on your preferred deployment method, not performance tradeoffs. For any non-trivial workflow,
+construct one of the first three engines explicitly (see {doc}`usage`); the
+`DefaultSingletonEngine` is a convenience and accepts no options, so it cannot be tuned. See
+{doc}`default_singleton_engine` for details.
 
 ## Where to go next
 

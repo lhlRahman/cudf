@@ -2,7 +2,8 @@
 # Configuration Options
 
 {class}`~cudf_polars.experimental.rapidsmpf.frontend.options.StreamingOptions` is the recommended
-way to configure the streaming engines. Build one and pass it to `RayEngine.from_options()`
+way to configure the streaming engines (Ray, Dask, SPMD; the implicit `DefaultSingletonEngine`
+accepts no options, see the note below). Build one and pass it to `RayEngine.from_options()`
 to construct a {class}`~cudf_polars.experimental.rapidsmpf.frontend.ray.RayEngine`:
 
 ```python
@@ -40,7 +41,7 @@ categories of fields:
 
 | Category    | Scope                                                                                  | Env var prefix             |
 | ----------- | -------------------------------------------------------------------------------------- | -------------------------- |
-| `rapidsmpf` | RapidsMPF runtime, e.g. threads, CUDA streams, spilling, pinned memory, log level      | `RAPIDSMPF_`               |
+| `rapidsmpf` | Streaming runtime, e.g. threads, CUDA streams, spilling, pinned memory, log level      | `RAPIDSMPF_`               |
 | `executor`  | Query execution and partitioning, e.g. `max_rows_per_partition`, `fallback_mode`, ...  | `CUDF_POLARS__EXECUTOR__`  |
 | `engine`    | `pl.GPUEngine` kwargs, e.g. Parquet, memory resource, CUDA streams, hardware binding   | `CUDF_POLARS__`            |
 
@@ -50,7 +51,7 @@ The `engine` category surfaces the same tuning knobs as plain `pl.GPUEngine(...)
 passing them to `pl.GPUEngine(...)` directly.
 
 The `rapidsmpf` category adds configuration for the streaming runtime that has no equivalent on the plain
-`pl.GPUEngine`. See the [RapidsMPF configuration reference][rapidsmpf-config] for the underlying
+`pl.GPUEngine`. See the [streaming runtime configuration reference][rapidsmpf-config] for the underlying
 meaning of each `RAPIDSMPF_*` field.
 
 Every option has a corresponding environment variable. When an option is not set explicitly, its
@@ -86,21 +87,8 @@ Otherwise, prefer the engine's `from_options` constructor with
 {class}`~cudf_polars.experimental.rapidsmpf.frontend.options.StreamingOptions`.
 
 For the in-memory engine,
-{class}`~cudf_polars.experimental.rapidsmpf.frontend.options.StreamingOptions` does not apply —
-pass keyword arguments to `pl.GPUEngine(...)` directly (see below).
-
-## In-memory Engine Options
-
-The in-memory GPU engine is configured by passing keyword arguments to
-[`polars.GPUEngine`][polars-gpuengine]:
-
-```python
-import polars as pl
-
-engine = pl.GPUEngine(parquet_options={"chunked": True})
-```
-
-See the [Polars GPU support guide][polars-gpu] for the full in-memory usage story.
+{class}`~cudf_polars.experimental.rapidsmpf.frontend.options.StreamingOptions` does not apply.
+See {doc}`in_memory_engine` for how to configure it.
 
 
 ## Options Reference
@@ -113,7 +101,7 @@ Environment variables follow these patterns:
 
 ### Category: `rapidsmpf`
 
-See the [RapidsMPF configuration reference][rapidsmpf-config] for the full list of fields and defaults.
+See the [streaming runtime configuration reference][rapidsmpf-config] for the full list of fields and defaults.
 
 ### Category: `executor`
 
@@ -139,6 +127,4 @@ See the [RapidsMPF configuration reference][rapidsmpf-config] for the full list 
 | `allow_gpu_sharing`      | When `False` (default), the engine raises if multiple ranks share the same physical GPU.                                                               | `False`                   |
 
 <!-- Reference links -->
-[polars-gpu]: https://docs.pola.rs/user-guide/gpu-support/
-[polars-gpuengine]: https://docs.pola.rs/api/python/stable/reference/lazyframe/api/polars.lazyframe.engine_config.GPUEngine.html
 [rapidsmpf-config]: https://docs.rapids.ai/api/rapidsmpf/nightly/configuration/

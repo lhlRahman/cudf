@@ -7,12 +7,21 @@ is a process-wide singleton specialization of
 executor when the user has *not* constructed an engine explicitly. At most one live instance
 exists per process; it is created lazily on first use and torn down at interpreter exit.
 
+`DefaultSingletonEngine` is a streaming engine: it runs the same streaming executor as
+{class}`~cudf_polars.experimental.rapidsmpf.frontend.ray.RayEngine`,
+{class}`~cudf_polars.experimental.rapidsmpf.frontend.dask.DaskEngine`, and
+{class}`~cudf_polars.experimental.rapidsmpf.frontend.spmd.SPMDEngine` (conceptually similar to
+[Polars' own streaming engine](https://docs.pola.rs/user-guide/concepts/streaming/), on the
+GPU). The single-GPU singleton form is what you get without configuring a cluster. Ray is the
+showcased explicit engine (see {doc}`usage`); this page is for understanding what you get
+*without* constructing one.
+
 ```{important}
-For any non-trivial workflow, construct an engine explicitly — for example
+For any non-trivial workflow, construct an engine explicitly. For example,
 {meth}`RayEngine.from_options(...) <cudf_polars.experimental.rapidsmpf.frontend.ray.RayEngine.from_options>`
 or {meth}`SPMDEngine.from_options(...) <cudf_polars.experimental.rapidsmpf.frontend.spmd.SPMDEngine.from_options>`.
-The default singleton uses no-argument defaults; if you need to tune anything — for example
-`spill_to_pinned_memory=True` for spill-heavy workloads — you must construct an engine
+The default singleton uses no-argument defaults; if you need to tune anything (for example
+`spill_to_pinned_memory=True` for spill-heavy workloads), you must construct an engine
 yourself. See {doc}`usage` and {doc}`options`.
 ```
 
