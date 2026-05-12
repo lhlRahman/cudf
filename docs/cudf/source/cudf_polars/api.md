@@ -21,7 +21,7 @@ multi-GPU engines.
    :show-inheritance:
 
 .. autoclass:: cudf_polars.experimental.rapidsmpf.frontend.default_singleton_engine.DefaultSingletonEngine
-   :members: create_or_get, shutdown
+   :members: get_or_create, shutdown
    :show-inheritance:
 ```
 

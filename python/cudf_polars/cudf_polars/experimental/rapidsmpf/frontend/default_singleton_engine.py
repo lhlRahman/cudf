@@ -221,16 +221,21 @@ def check_no_live_default_singleton(self_engine: Any) -> None:
 
 class DefaultSingletonEngine(SPMDEngine):
     """
-    Process-wide single-GPU singleton specialization of :class:`SPMDEngine`.
+    Process-wide single-GPU singleton specialization of ``SPMDEngine``.
 
-    At most one live instance exists per process. Use :meth:`get_or_create`
-    to obtain it and :meth:`shutdown` to tear it down.
+    Specifically, a specialization of
+    :class:`~cudf_polars.experimental.rapidsmpf.frontend.spmd.SPMDEngine`.
+    At most one live instance exists per process. Use
+    :meth:`DefaultSingletonEngine.get_or_create` to obtain it and
+    :meth:`DefaultSingletonEngine.shutdown` to tear it down.
 
     Always constructs a single-rank communicator and uses default RapidsMPF,
     executor, and engine settings from the environment.
 
     Users needing custom configuration should construct an engine explicitly.
-    See :class:`RayEngine`, :class:`DaskEngine`, and :class:`SPMDEngine`.
+    See :class:`~cudf_polars.experimental.rapidsmpf.frontend.ray.RayEngine`,
+    :class:`~cudf_polars.experimental.rapidsmpf.frontend.dask.DaskEngine`,
+    and :class:`~cudf_polars.experimental.rapidsmpf.frontend.spmd.SPMDEngine`.
 
     Examples
     --------
@@ -275,7 +280,9 @@ class DefaultSingletonEngine(SPMDEngine):
         Raises
         ------
         RuntimeError
-            If any other :class:`StreamingEngine` is currently alive.
+            If any other
+            :class:`~cudf_polars.experimental.rapidsmpf.frontend.core.StreamingEngine`
+            is currently alive.
         """
         with _state.lock:
             if _state.instance is not None:
@@ -292,7 +299,7 @@ class DefaultSingletonEngine(SPMDEngine):
 
         Submits teardown to the dedicated worker thread, the same thread
         that constructed the rapidsmpf ``Context``, and waits up to
-        :data:`SHUTDOWN_TIMEOUT_SECONDS`.
+        ``SHUTDOWN_TIMEOUT_SECONDS``.
         """
         with _state.lock:
             instance = _state.instance
