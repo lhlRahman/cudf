@@ -78,7 +78,7 @@ def _run_in_subprocess(target: Callable[[], None]) -> None:
 
 def _reset_bind_state() -> None:
     """Reset the module-level bind state so each subprocess starts clean."""
-    from cudf_polars.streaming.frontend import hardware_binding
+    from cudf_polars.engine import hardware_binding
 
     hardware_binding._bind_done = False
 
@@ -91,8 +91,8 @@ def _reset_bind_state() -> None:
 
 def _body_bind_called_once() -> None:
     _reset_bind_state()
-    with patch("cudf_polars.streaming.frontend.hardware_binding.bind") as mock_bind:
-        from cudf_polars.streaming.frontend.hardware_binding import (
+    with patch("cudf_polars.engine.hardware_binding.bind") as mock_bind:
+        from cudf_polars.engine.hardware_binding import (
             HardwareBindingPolicy,
             bind_to_gpu,
         )
@@ -112,10 +112,10 @@ def _body_bind_falls_back_to_gpu_0() -> None:
     _reset_bind_state()
     mock_bind = MagicMock(side_effect=[RuntimeError("no CUDA_VISIBLE_DEVICES"), None])
     with patch(
-        "cudf_polars.streaming.frontend.hardware_binding.bind",
+        "cudf_polars.engine.hardware_binding.bind",
         mock_bind,
     ):
-        from cudf_polars.streaming.frontend.hardware_binding import (
+        from cudf_polars.engine.hardware_binding import (
             HardwareBindingPolicy,
             bind_to_gpu,
         )
@@ -143,10 +143,10 @@ def _body_bind_raise_on_fail_propagates_exception() -> None:
     _reset_bind_state()
     mock_bind = MagicMock(side_effect=RuntimeError("binding failed"))
     with patch(
-        "cudf_polars.streaming.frontend.hardware_binding.bind",
+        "cudf_polars.engine.hardware_binding.bind",
         mock_bind,
     ):
-        from cudf_polars.streaming.frontend.hardware_binding import (
+        from cudf_polars.engine.hardware_binding import (
             HardwareBindingPolicy,
             bind_to_gpu,
         )
@@ -164,10 +164,10 @@ def _body_bind_raise_on_fail_false_suppresses_exception() -> None:
     _reset_bind_state()
     mock_bind = MagicMock(side_effect=RuntimeError("binding failed"))
     with patch(
-        "cudf_polars.streaming.frontend.hardware_binding.bind",
+        "cudf_polars.engine.hardware_binding.bind",
         mock_bind,
     ):
-        from cudf_polars.streaming.frontend.hardware_binding import (
+        from cudf_polars.engine.hardware_binding import (
             HardwareBindingPolicy,
             bind_to_gpu,
         )
@@ -184,8 +184,8 @@ def _body_bind_thread_safe() -> None:
     import threading
 
     _reset_bind_state()
-    with patch("cudf_polars.streaming.frontend.hardware_binding.bind") as mock_bind:
-        from cudf_polars.streaming.frontend.hardware_binding import (
+    with patch("cudf_polars.engine.hardware_binding.bind") as mock_bind:
+        from cudf_polars.engine.hardware_binding import (
             HardwareBindingPolicy,
             bind_to_gpu,
         )
@@ -212,11 +212,11 @@ def test_bind_thread_safe() -> None:
 
 
 def _body_bind_done_flag_set() -> None:
-    from cudf_polars.streaming.frontend import hardware_binding
+    from cudf_polars.engine import hardware_binding
 
     _reset_bind_state()
     assert not hardware_binding._bind_done
-    with patch("cudf_polars.streaming.frontend.hardware_binding.bind"):
+    with patch("cudf_polars.engine.hardware_binding.bind"):
         hardware_binding.bind_to_gpu(hardware_binding.HardwareBindingPolicy())
         assert hardware_binding._bind_done
 
@@ -228,8 +228,8 @@ def test_bind_done_flag_set() -> None:
 
 def _body_bind_disabled() -> None:
     _reset_bind_state()
-    with patch("cudf_polars.streaming.frontend.hardware_binding.bind") as mock_bind:
-        from cudf_polars.streaming.frontend.hardware_binding import (
+    with patch("cudf_polars.engine.hardware_binding.bind") as mock_bind:
+        from cudf_polars.engine.hardware_binding import (
             HardwareBindingPolicy,
             bind_to_gpu,
         )
@@ -245,8 +245,8 @@ def test_bind_disabled() -> None:
 
 def _body_bind_enable_once_false() -> None:
     _reset_bind_state()
-    with patch("cudf_polars.streaming.frontend.hardware_binding.bind") as mock_bind:
-        from cudf_polars.streaming.frontend.hardware_binding import (
+    with patch("cudf_polars.engine.hardware_binding.bind") as mock_bind:
+        from cudf_polars.engine.hardware_binding import (
             HardwareBindingPolicy,
             bind_to_gpu,
         )
@@ -268,7 +268,7 @@ def test_bind_enable_once_false() -> None:
 
 
 def test_get_visible_gpu_ids_from_env(monkeypatch: pytest.MonkeyPatch) -> None:
-    from cudf_polars.streaming.frontend.dask import _get_visible_gpu_ids
+    from cudf_polars.engine.dask import _get_visible_gpu_ids
 
     monkeypatch.setenv("CUDA_VISIBLE_DEVICES", "3,1,4")
     assert _get_visible_gpu_ids() == ["3", "1", "4"]
@@ -276,7 +276,7 @@ def test_get_visible_gpu_ids_from_env(monkeypatch: pytest.MonkeyPatch) -> None:
 
 def test_dask_setup_assigns_gpus(monkeypatch: pytest.MonkeyPatch) -> None:
     """dask_setup assigns round-robin CUDA_VISIBLE_DEVICES to each nanny."""
-    import cudf_polars.streaming.frontend.dask as dask_mod
+    import cudf_polars.engine.dask as dask_mod
 
     monkeypatch.setenv("CUDA_VISIBLE_DEVICES", "0,1")
     monkeypatch.setattr(dask_mod, "_nanny_preload_counter", 0)
@@ -294,7 +294,7 @@ def test_dask_setup_assigns_gpus(monkeypatch: pytest.MonkeyPatch) -> None:
 
 def test_dask_setup_wraps_around(monkeypatch: pytest.MonkeyPatch) -> None:
     """Counter wraps around when workers exceed GPUs."""
-    import cudf_polars.streaming.frontend.dask as dask_mod
+    import cudf_polars.engine.dask as dask_mod
 
     monkeypatch.setenv("CUDA_VISIBLE_DEVICES", "0,1")
     monkeypatch.setattr(dask_mod, "_nanny_preload_counter", 0)
@@ -314,7 +314,7 @@ def test_dask_setup_wraps_around(monkeypatch: pytest.MonkeyPatch) -> None:
 
 def test_dask_setup_rejects_worker() -> None:
     """dask_setup raises TypeError when used with --preload instead of --preload-nanny."""
-    import cudf_polars.streaming.frontend.dask as dask_mod
+    import cudf_polars.engine.dask as dask_mod
 
     worker = MagicMock(spec=distributed.Worker)
     with pytest.raises(TypeError, match="--preload-nanny"):

@@ -13,12 +13,12 @@ import pytest
 
 import polars as pl
 
+from cudf_polars.engine.options import StreamingOptions
 from cudf_polars.streaming.explain import (
     _fmt_row_count,
     explain_query,
     serialize_query,
 )
-from cudf_polars.streaming.frontend.options import StreamingOptions
 from cudf_polars.testing.asserts import assert_gpu_result_equal
 from cudf_polars.testing.io import make_lazy_frame, make_partitioned_source
 

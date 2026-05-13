@@ -11,8 +11,8 @@ import pytest
 
 import polars as pl
 
+from cudf_polars.engine.options import StreamingOptions
 from cudf_polars.streaming.collectives.shuffle import ShuffleManager
-from cudf_polars.streaming.frontend.options import StreamingOptions
 from cudf_polars.testing.asserts import assert_gpu_result_equal
 
 

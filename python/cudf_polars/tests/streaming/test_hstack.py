@@ -15,7 +15,7 @@ from cudf_polars.dsl.expr import Col
 from cudf_polars.dsl.expressions.base import ExecutionContext
 from cudf_polars.dsl.ir import Filter, HStack
 from cudf_polars.dsl.traversal import traversal
-from cudf_polars.streaming.frontend.options import StreamingOptions
+from cudf_polars.engine.options import StreamingOptions
 from cudf_polars.streaming.parallel import lower_ir_graph
 from cudf_polars.streaming.repartition import Repartition
 from cudf_polars.streaming.statistics import collect_statistics

@@ -27,14 +27,14 @@ import polars as pl
 
 import rmm.mr
 
-from cudf_polars.streaming.frontend.core import (
+from cudf_polars.engine.core import (
     ClusterInfo,
     StreamingEngine,
     check_reserved_keys,
     evaluate_on_rank,
     resolve_rapidsmpf_options,
 )
-from cudf_polars.streaming.frontend.hardware_binding import (
+from cudf_polars.engine.hardware_binding import (
     HardwareBindingPolicy,
     bind_to_gpu,
 )
@@ -48,8 +48,8 @@ if TYPE_CHECKING:
     from rapidsmpf.streaming.cudf.channel_metadata import ChannelMetadata
 
     from cudf_polars.dsl.ir import IR
-    from cudf_polars.streaming.frontend.core import T
-    from cudf_polars.streaming.frontend.options import StreamingOptions
+    from cudf_polars.engine.core import T
+    from cudf_polars.engine.options import StreamingOptions
     from cudf_polars.streaming.parallel import ConfigOptions
     from cudf_polars.utils.config import StreamingExecutor
 
@@ -87,7 +87,7 @@ def dask_setup(nanny: distributed.Nanny) -> None:
     Usage::
 
         dask worker SCHEDULER:8786 --nworkers N --nthreads 1 \
-            --preload-nanny cudf_polars.streaming.frontend.dask
+            --preload-nanny cudf_polars.engine.dask
 
     Parameters
     ----------
@@ -557,7 +557,7 @@ class DaskEngine(StreamingEngine):
     and sets ``CUDA_VISIBLE_DEVICES`` per worker), disable some or all of the
     built-in binding to avoid conflicts:
 
-    >>> from cudf_polars.streaming.frontend.hardware_binding import (
+    >>> from cudf_polars.engine.hardware_binding import (
     ...     HardwareBindingPolicy,
     ... )
     >>> with DaskEngine(  # doctest: +SKIP
@@ -572,7 +572,7 @@ class DaskEngine(StreamingEngine):
     one GPU per worker before the worker process spawns::
 
         dask worker SCHEDULER:8786 --nworkers N --nthreads 1 \
-            --preload-nanny cudf_polars.streaming.frontend.dask
+            --preload-nanny cudf_polars.engine.dask
 
     Then connect from the client::
 
@@ -776,7 +776,7 @@ class DaskEngine(StreamingEngine):
 
         Examples
         --------
-        >>> from cudf_polars.streaming.frontend.options import (
+        >>> from cudf_polars.engine.options import (
         ...     StreamingOptions,
         ... )
         >>> opts = StreamingOptions(num_streaming_threads=4, fallback_mode="silent")

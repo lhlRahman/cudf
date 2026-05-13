@@ -14,8 +14,8 @@ import polars as pl
 from cudf_polars import Translator
 from cudf_polars.containers import DataType
 from cudf_polars.dsl.ir import Empty, Projection
+from cudf_polars.engine.options import StreamingOptions
 from cudf_polars.streaming.base import SerializedDataSourceInfo, StatsCollector
-from cudf_polars.streaming.frontend.options import StreamingOptions
 from cudf_polars.streaming.io import (
     DataFrameSourceInfo,
     ParquetSourceInfo,

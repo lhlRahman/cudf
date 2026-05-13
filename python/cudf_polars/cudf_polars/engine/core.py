@@ -169,7 +169,7 @@ class StreamingEngine(pl.GPUEngine):
     ):
         # Refuse to construct if a ``DefaultSingletonEngine`` is alive
         # (no-op for the singleton itself).
-        from cudf_polars.streaming.frontend.default_singleton_engine import (
+        from cudf_polars.engine.default_singleton_engine import (
             check_no_live_default_singleton,
         )
 

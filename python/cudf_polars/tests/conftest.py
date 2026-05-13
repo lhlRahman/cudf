@@ -20,9 +20,9 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Generator, Mapping
     from typing import TypeAlias
 
-    from cudf_polars.streaming.frontend.core import StreamingEngine
-    from cudf_polars.streaming.frontend.options import StreamingOptions
-    from cudf_polars.streaming.frontend.spmd import SPMDEngine
+    from cudf_polars.engine.core import StreamingEngine
+    from cudf_polars.engine.options import StreamingOptions
+    from cudf_polars.engine.spmd import SPMDEngine
 
     # Read-only view over the per-backend streaming engines owned by the
     # ``streaming_engines`` session fixture. Only that fixture mutates the
@@ -82,7 +82,7 @@ def streaming_engines() -> Generator[StreamingEngines, None, None]:
     from rapidsmpf.config import Options, get_environment_variables
     from rapidsmpf.progress_thread import ProgressThread
 
-    from cudf_polars.streaming.frontend.spmd import SPMDEngine
+    from cudf_polars.engine.spmd import SPMDEngine
 
     if bootstrap.is_running_with_rrun():
         comm = bootstrap.create_ucxx_comm(
@@ -97,12 +97,12 @@ def streaming_engines() -> Generator[StreamingEngines, None, None]:
     engines: dict[str, StreamingEngine] = {"spmd": SPMDEngine(comm=comm)}
 
     if "dask" in STREAMING_ENGINE_FIXTURE_PARAMS:  # pragma: no cover
-        from cudf_polars.streaming.frontend.dask import DaskEngine
+        from cudf_polars.engine.dask import DaskEngine
 
         engines["dask"] = DaskEngine(engine_options={"allow_gpu_sharing": True})
 
     if "ray" in STREAMING_ENGINE_FIXTURE_PARAMS:  # pragma: no cover
-        from cudf_polars.streaming.frontend.ray import RayEngine
+        from cudf_polars.engine.ray import RayEngine
 
         # Always pin ``num_ranks`` so the cached engine has a deterministic
         # actor count regardless of how many GPUs the host happens to have;
@@ -127,7 +127,7 @@ def streaming_engines() -> Generator[StreamingEngines, None, None]:
 @pytest.fixture
 def spmd_engine(streaming_engines: StreamingEngines) -> SPMDEngine:
     """Return the shared :class:`SPMDEngine` reset to default options."""
-    from cudf_polars.streaming.frontend.spmd import SPMDEngine
+    from cudf_polars.engine.spmd import SPMDEngine
 
     engine = streaming_engines["spmd"]
     assert isinstance(engine, SPMDEngine)
@@ -145,7 +145,7 @@ def spmd_engine_factory(
     Use this in place of :func:`streaming_engine_factory` for tests that
     must run on SPMD only.
     """
-    from cudf_polars.streaming.frontend.spmd import SPMDEngine
+    from cudf_polars.engine.spmd import SPMDEngine
 
     param = EngineFixtureParam(full_name="spmd")
 

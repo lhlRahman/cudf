@@ -16,12 +16,12 @@ import polars as pl
 
 import rmm.mr
 
-from cudf_polars.streaming.collectives.common import reserve_op_id
-from cudf_polars.streaming.frontend.options import StreamingOptions
-from cudf_polars.streaming.frontend.spmd import (
+from cudf_polars.engine.options import StreamingOptions
+from cudf_polars.engine.spmd import (
     SPMDEngine,
     allgather_polars_dataframe,
 )
+from cudf_polars.streaming.collectives.common import reserve_op_id
 from cudf_polars.utils.config import MemoryResourceConfig
 
 if TYPE_CHECKING:
@@ -361,7 +361,7 @@ def test_reset_rejects_construction_time_engine_options(
     comm: Communicator,
 ) -> None:
     """``_reset`` rejects ``engine_options`` keys read at engine construction."""
-    from cudf_polars.streaming.frontend.hardware_binding import (
+    from cudf_polars.engine.hardware_binding import (
         HardwareBindingPolicy,
     )
 

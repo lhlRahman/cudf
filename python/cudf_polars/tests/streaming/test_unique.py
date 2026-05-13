@@ -8,7 +8,7 @@ import pytest
 import polars as pl
 from polars.testing import assert_frame_equal
 
-from cudf_polars.streaming.frontend.options import StreamingOptions
+from cudf_polars.engine.options import StreamingOptions
 from cudf_polars.testing.asserts import assert_gpu_result_equal
 from cudf_polars.testing.engine_utils import warns_on_spmd
 

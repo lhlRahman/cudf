@@ -10,7 +10,7 @@ import pytest
 
 import polars as pl
 
-from cudf_polars.streaming.frontend.options import StreamingOptions
+from cudf_polars.engine.options import StreamingOptions
 from cudf_polars.testing.asserts import assert_sink_result_equal
 from cudf_polars.utils.config import Cluster, StreamingExecutor
 
@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from pathlib import Path
 
-    from cudf_polars.streaming.frontend.core import StreamingEngine
+    from cudf_polars.engine.core import StreamingEngine
 
 # Runs the spmd variant even under rrun with nranks > 1. The ray/dask
 # variants skip themselves in that environment.

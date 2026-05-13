@@ -22,12 +22,12 @@ from cudf_polars import Translator
 from cudf_polars.containers import DataFrame, DataType
 from cudf_polars.dsl import expr
 from cudf_polars.dsl.ir import GroupBy, HStack, Projection, Select
+from cudf_polars.engine.options import StreamingOptions
 from cudf_polars.streaming.actor_graph.core import evaluate_logical_plan
 from cudf_polars.streaming.actor_graph.utils import (
     NormalizedPartitioning,
     maybe_remap_partitioning,
 )
-from cudf_polars.streaming.frontend.options import StreamingOptions
 from cudf_polars.utils.config import ConfigOptions
 
 

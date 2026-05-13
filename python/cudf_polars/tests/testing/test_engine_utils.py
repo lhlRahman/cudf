@@ -42,7 +42,7 @@ def test_create_streaming_options_small():
 
 def test_create_streaming_options_overrides_merge():
     """Overrides take precedence over the blocksize baseline."""
-    from cudf_polars.streaming.frontend.options import StreamingOptions
+    from cudf_polars.engine.options import StreamingOptions
 
     overrides = StreamingOptions(max_rows_per_partition=999)
     merged = create_streaming_options("medium", overrides)

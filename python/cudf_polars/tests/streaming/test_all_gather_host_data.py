@@ -9,11 +9,11 @@ import struct
 
 import pytest
 
-from cudf_polars.streaming.frontend.core import (
+from cudf_polars.engine.core import (
     ClusterInfo,
     all_gather_host_data,
 )
-from cudf_polars.streaming.frontend.options import StreamingOptions
+from cudf_polars.engine.options import StreamingOptions
 
 pytestmark = pytest.mark.spmd
 

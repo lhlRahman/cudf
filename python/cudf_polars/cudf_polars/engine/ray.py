@@ -23,14 +23,14 @@ import polars as pl
 
 import rmm.mr
 
-from cudf_polars.streaming.frontend.core import (
+from cudf_polars.engine.core import (
     ClusterInfo,
     StreamingEngine,
     check_reserved_keys,
     evaluate_on_rank,
     resolve_rapidsmpf_options,
 )
-from cudf_polars.streaming.frontend.hardware_binding import (
+from cudf_polars.engine.hardware_binding import (
     HardwareBindingPolicy,
     bind_to_gpu,
 )
@@ -46,8 +46,8 @@ if TYPE_CHECKING:
     from ray.actor import ActorHandle
 
     from cudf_polars.dsl.ir import IR
-    from cudf_polars.streaming.frontend.core import T
-    from cudf_polars.streaming.frontend.options import StreamingOptions
+    from cudf_polars.engine.core import T
+    from cudf_polars.engine.options import StreamingOptions
     from cudf_polars.streaming.parallel import ConfigOptions
     from cudf_polars.utils.config import StreamingExecutor
 
@@ -163,7 +163,7 @@ class RankActor:
 
     Notes
     -----
-    Calls :func:`~cudf_polars.streaming.frontend.hardware_binding.bind_to_gpu`
+    Calls :func:`~cudf_polars.engine.hardware_binding.bind_to_gpu`
     at construction time, before RMM and communicator initialisation, so that
     CPU affinity, NUMA memory policy, and ``UCX_NET_DEVICES`` are set as early
     as possible.
@@ -422,7 +422,7 @@ class RayEngine(StreamingEngine):
     to ``LazyFrame.collect(engine=engine)``.
 
     Prefer :meth:`from_options` for typical use — pass a
-    :class:`~cudf_polars.streaming.frontend.options.StreamingOptions`
+    :class:`~cudf_polars.engine.options.StreamingOptions`
     instance for a unified, typed interface. The ``__init__`` parameters
     (``rapidsmpf_options``, ``executor_options``, ``engine_options``) are
     intended for advanced use when fine-grained control is needed.
@@ -685,7 +685,7 @@ class RayEngine(StreamingEngine):
 
         Examples
         --------
-        >>> from cudf_polars.streaming.frontend.options import (
+        >>> from cudf_polars.engine.options import (
         ...     StreamingOptions,
         ... )
         >>> opts = StreamingOptions(num_streaming_threads=4, fallback_mode="silent")

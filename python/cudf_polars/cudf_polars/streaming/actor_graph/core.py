@@ -73,7 +73,7 @@ def evaluate_logical_plan(
     # For default_singleton, inject the process-wide DefaultSingletonEngine instance
     # into config_options before treating it as a regular SPMDEngine.
     if config_options.executor.cluster == "default_singleton":
-        from cudf_polars.streaming.frontend.default_singleton_engine import (
+        from cudf_polars.engine.default_singleton_engine import (
             DefaultSingletonEngine,
         )
 
@@ -96,7 +96,7 @@ def evaluate_logical_plan(
     ):
         match config_options.executor.cluster:
             case "spmd" | "default_singleton":
-                from cudf_polars.streaming.frontend.spmd import (
+                from cudf_polars.engine.spmd import (
                     evaluate_pipeline_spmd_mode,
                 )
 
@@ -107,7 +107,7 @@ def evaluate_logical_plan(
                     query_id=query_id,
                 )
             case "ray":
-                from cudf_polars.streaming.frontend.ray import (
+                from cudf_polars.engine.ray import (
                     evaluate_pipeline_ray_mode,
                 )
 
@@ -118,7 +118,7 @@ def evaluate_logical_plan(
                     query_id=query_id,
                 )
             case "dask":
-                from cudf_polars.streaming.frontend.dask import (
+                from cudf_polars.engine.dask import (
                     evaluate_pipeline_dask_mode,
                 )
 

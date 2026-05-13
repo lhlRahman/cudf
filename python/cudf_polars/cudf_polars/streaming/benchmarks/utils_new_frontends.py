@@ -77,9 +77,9 @@ except ImportError:
 if TYPE_CHECKING:
     from collections.abc import Callable
 
+    from cudf_polars.engine.core import StreamingEngine
+    from cudf_polars.engine.options import StreamingOptions
     from cudf_polars.streaming.explain import SerializablePlan
-    from cudf_polars.streaming.frontend.core import StreamingEngine
-    from cudf_polars.streaming.frontend.options import StreamingOptions
 POLARS_VALIDATION_OPTIONS = {
     "check_row_order": True,
     "check_column_order": True,
@@ -401,7 +401,7 @@ class RunConfig:
     # All streaming/rapidsmpf/engine knobs
     streaming_options: StreamingOptions = dataclasses.field(
         default_factory=lambda: __import__(
-            "cudf_polars.streaming.frontend.options",
+            "cudf_polars.engine.options",
             fromlist=["StreamingOptions"],
         ).StreamingOptions()
     )
@@ -440,7 +440,7 @@ class RunConfig:
     @classmethod
     def from_args(cls, args: argparse.Namespace) -> RunConfig:
         """Create a RunConfig from command line arguments."""
-        from cudf_polars.streaming.frontend.options import StreamingOptions
+        from cudf_polars.engine.options import StreamingOptions
 
         streaming_options = StreamingOptions._from_argparse(args)
 
@@ -1089,7 +1089,7 @@ def run_polars_spmd(
     validation_files: dict[int, Path] | None,
 ) -> None:
     """Run benchmark queries using SPMD execution via the ``rrun`` launcher."""
-    from cudf_polars.streaming.frontend.spmd import SPMDEngine
+    from cudf_polars.engine.spmd import SPMDEngine
 
     executor_options = get_executor_options(run_config, benchmark=benchmark)
     # "cluster" is reserved — SPMDEngine sets it
@@ -1103,10 +1103,10 @@ def run_polars_spmd(
         executor_options=executor_options,
         engine_options=engine_options,
     ) as engine:
-        from cudf_polars.streaming.collectives.common import reserve_op_id
-        from cudf_polars.streaming.frontend.spmd import (
+        from cudf_polars.engine.spmd import (
             allgather_polars_dataframe,
         )
+        from cudf_polars.streaming.collectives.common import reserve_op_id
 
         def _allgather_result(df: pl.DataFrame) -> pl.DataFrame:
             with reserve_op_id() as op_id:
@@ -1146,7 +1146,7 @@ def run_polars_ray(
     validation_files: dict[int, Path] | None,
 ) -> None:
     """Run benchmark queries using Ray actor-based distributed execution."""
-    from cudf_polars.streaming.frontend.ray import RayEngine
+    from cudf_polars.engine.ray import RayEngine
 
     executor_options = get_executor_options(run_config, benchmark=benchmark)
     # "cluster" is reserved — RayEngine sets it
@@ -1195,7 +1195,7 @@ def run_polars_dask(
     """Run benchmark queries using Dask distributed execution."""
     import distributed
 
-    from cudf_polars.streaming.frontend.dask import DaskEngine
+    from cudf_polars.engine.dask import DaskEngine
 
     executor_options = get_executor_options(run_config, benchmark=benchmark)
     # "cluster" is reserved — DaskEngine sets it
@@ -1627,7 +1627,7 @@ def _query_type(num_queries: int) -> Any:
 
 def build_parser(num_queries: int = 22) -> argparse.ArgumentParser:
     """Build the argument parser for PDS-H/PDS-DS benchmarks (new-frontend)."""
-    from cudf_polars.streaming.frontend.options import StreamingOptions
+    from cudf_polars.engine.options import StreamingOptions
 
     parser = argparse.ArgumentParser(
         prog="Cudf-Polars PDS-H/PDS-DS Benchmarks",

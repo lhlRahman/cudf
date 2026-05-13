@@ -16,7 +16,7 @@ import polars as pl
 from cudf_polars.utils.config import RayContext
 
 ray = pytest.importorskip("ray")
-from cudf_polars.streaming.frontend.ray import RayEngine  # noqa: E402
+from cudf_polars.engine.ray import RayEngine  # noqa: E402
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -304,7 +304,7 @@ def test_reset_rejects_construction_time_engine_options(
     reset_engine: RayEngine,
 ) -> None:
     """``_reset`` rejects ``engine_options`` keys read at actor construction."""
-    from cudf_polars.streaming.frontend.hardware_binding import (
+    from cudf_polars.engine.hardware_binding import (
         HardwareBindingPolicy,
     )
 

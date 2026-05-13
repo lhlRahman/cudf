@@ -12,9 +12,9 @@ import polars as pl
 from cudf_polars import Translator
 from cudf_polars.dsl.ir import Cache, Join
 from cudf_polars.dsl.traversal import traversal
+from cudf_polars.engine.options import StreamingOptions
 from cudf_polars.streaming.actor_graph.join import _use_pwise_join
 from cudf_polars.streaming.base import PartitionInfo
-from cudf_polars.streaming.frontend.options import StreamingOptions
 from cudf_polars.streaming.parallel import lower_ir_graph
 from cudf_polars.streaming.shuffle import Shuffle
 from cudf_polars.streaming.statistics import collect_statistics
