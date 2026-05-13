@@ -13,7 +13,7 @@ from polars.testing import assert_frame_equal
 
 from cudf_polars import Translator
 from cudf_polars.dsl.traversal import traversal
-from cudf_polars.experimental.rapidsmpf.frontend.options import StreamingOptions
+from cudf_polars.experimental.frontend.options import StreamingOptions
 from cudf_polars.testing.asserts import assert_gpu_result_equal
 
 

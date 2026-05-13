@@ -12,10 +12,10 @@ from rapidsmpf.streaming.cudf.channel_metadata import (
 
 import polars as pl
 
-from cudf_polars.experimental.rapidsmpf.frontend.options import StreamingOptions
-from cudf_polars.experimental.rapidsmpf.utils import (
+from cudf_polars.experimental.actor_graph.utils import (
     _is_already_partitioned,
 )
+from cudf_polars.experimental.frontend.options import StreamingOptions
 from cudf_polars.testing.asserts import assert_gpu_result_equal
 
 

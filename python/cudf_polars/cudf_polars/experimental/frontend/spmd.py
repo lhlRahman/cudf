@@ -27,8 +27,9 @@ import pylibcudf as plc
 from pylibcudf.contiguous_split import pack
 
 from cudf_polars.containers import DataFrame, DataType
-from cudf_polars.experimental.rapidsmpf.collectives.common import reserve_op_id
-from cudf_polars.experimental.rapidsmpf.frontend.core import (
+from cudf_polars.experimental.actor_graph.utils import set_memory_resource
+from cudf_polars.experimental.collectives.common import reserve_op_id
+from cudf_polars.experimental.frontend.core import (
     ClusterInfo,
     StreamingEngine,
     all_gather_host_data,
@@ -36,11 +37,10 @@ from cudf_polars.experimental.rapidsmpf.frontend.core import (
     evaluate_on_rank,
     resolve_rapidsmpf_options,
 )
-from cudf_polars.experimental.rapidsmpf.frontend.hardware_binding import (
+from cudf_polars.experimental.frontend.hardware_binding import (
     HardwareBindingPolicy,
     bind_to_gpu,
 )
-from cudf_polars.experimental.rapidsmpf.utils import set_memory_resource
 from cudf_polars.utils.config import (
     MemoryResourceConfig,
     SPMDContext,
@@ -58,9 +58,9 @@ if TYPE_CHECKING:
     import polars as pl
 
     from cudf_polars.dsl.ir import IR
+    from cudf_polars.experimental.frontend.core import T
+    from cudf_polars.experimental.frontend.options import StreamingOptions
     from cudf_polars.experimental.parallel import ConfigOptions
-    from cudf_polars.experimental.rapidsmpf.frontend.core import T
-    from cudf_polars.experimental.rapidsmpf.frontend.options import StreamingOptions
     from cudf_polars.utils.config import StreamingExecutor
 
 
@@ -205,7 +205,7 @@ class SPMDEngine(StreamingEngine):
     a globally consistent result.
 
     Prefer :meth:`from_options` for typical use — pass a
-    :class:`~cudf_polars.experimental.rapidsmpf.frontend.options.StreamingOptions`
+    :class:`~cudf_polars.experimental.frontend.options.StreamingOptions`
     instance for a unified, typed interface. The ``__init__`` parameters
     (``rapidsmpf_options``, ``executor_options``, ``engine_options``) are
     intended for advanced use when fine-grained control is needed.
@@ -308,7 +308,7 @@ class SPMDEngine(StreamingEngine):
     Notes
     -----
     Calls
-    :func:`~cudf_polars.experimental.rapidsmpf.frontend.hardware_binding.bind_to_gpu`
+    :func:`~cudf_polars.experimental.frontend.hardware_binding.bind_to_gpu`
     at construction time, before RMM and communicator initialisation, so that
     CPU affinity, NUMA memory policy, and ``UCX_NET_DEVICES`` are set as early
     as possible.  By default, binding is skipped under ``rrun`` (which already
@@ -447,7 +447,7 @@ class SPMDEngine(StreamingEngine):
 
         Examples
         --------
-        >>> from cudf_polars.experimental.rapidsmpf.frontend.options import (
+        >>> from cudf_polars.experimental.frontend.options import (
         ...     StreamingOptions,
         ... )
         >>> opts = StreamingOptions(num_streaming_threads=8, fallback_mode="silent")

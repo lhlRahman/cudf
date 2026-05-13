@@ -44,10 +44,10 @@ def proc_pool() -> Generator[ProcessPoolExecutor, None, None]:
 
 def _reset_singleton_module_state() -> None:
     """Tear down any leftover engine and reset every module-level slot."""
-    from cudf_polars.experimental.rapidsmpf.frontend import (
+    from cudf_polars.experimental.frontend import (
         default_singleton_engine as dse,
     )
-    from cudf_polars.experimental.rapidsmpf.frontend.default_singleton_engine import (
+    from cudf_polars.experimental.frontend.default_singleton_engine import (
         DefaultSingletonEngine,
     )
 
@@ -88,10 +88,10 @@ def _body_lifecycle() -> None:
 
     import polars as pl
 
-    from cudf_polars.experimental.rapidsmpf.frontend.default_singleton_engine import (
+    from cudf_polars.experimental.frontend.default_singleton_engine import (
         DefaultSingletonEngine,
     )
-    from cudf_polars.experimental.rapidsmpf.frontend.spmd import SPMDEngine
+    from cudf_polars.experimental.frontend.spmd import SPMDEngine
 
     # Construction succeeds; isinstance check skips its parent's
     # ``check_no_live_default_singleton`` so SPMDEngine.__init__ runs cleanly.
@@ -124,10 +124,10 @@ def _body_default_path_routing() -> None:
     """
     import polars as pl
 
-    from cudf_polars.experimental.rapidsmpf.frontend import (
+    from cudf_polars.experimental.frontend import (
         default_singleton_engine as dse,
     )
-    from cudf_polars.experimental.rapidsmpf.frontend.default_singleton_engine import (
+    from cudf_polars.experimental.frontend.default_singleton_engine import (
         DefaultSingletonEngine,
     )
 
@@ -164,7 +164,7 @@ def _body_concurrent_warm_path() -> None:
     """Concurrent ``get_or_create()`` calls return the same instance."""
     import threading
 
-    from cudf_polars.experimental.rapidsmpf.frontend.default_singleton_engine import (
+    from cudf_polars.experimental.frontend.default_singleton_engine import (
         DefaultSingletonEngine,
     )
 
@@ -196,10 +196,10 @@ def _body_atexit_no_op() -> None:
     ``DefaultSingletonEngine.shutdown`` (registered once at import as the
     atexit hook) is a no-op when no engine is live.
     """
-    from cudf_polars.experimental.rapidsmpf.frontend import (
+    from cudf_polars.experimental.frontend import (
         default_singleton_engine as dse,
     )
-    from cudf_polars.experimental.rapidsmpf.frontend.default_singleton_engine import (
+    from cudf_polars.experimental.frontend.default_singleton_engine import (
         DefaultSingletonEngine,
     )
 
@@ -222,11 +222,11 @@ def _body_singleton_blocked_when_explicit_alive() -> None:
     """
     import pytest
 
-    from cudf_polars.experimental.rapidsmpf.frontend.core import StreamingEngine
-    from cudf_polars.experimental.rapidsmpf.frontend.default_singleton_engine import (
+    from cudf_polars.experimental.frontend.core import StreamingEngine
+    from cudf_polars.experimental.frontend.default_singleton_engine import (
         DefaultSingletonEngine,
     )
-    from cudf_polars.experimental.rapidsmpf.frontend.spmd import SPMDEngine
+    from cudf_polars.experimental.frontend.spmd import SPMDEngine
 
     assert StreamingEngine._active_engine_count() == 0
 
@@ -261,13 +261,13 @@ def _body_worker_thread_isolation() -> None:
 
     import pytest
 
-    from cudf_polars.experimental.rapidsmpf.frontend import (
+    from cudf_polars.experimental.frontend import (
         default_singleton_engine as dse,
     )
-    from cudf_polars.experimental.rapidsmpf.frontend.default_singleton_engine import (
+    from cudf_polars.experimental.frontend.default_singleton_engine import (
         DefaultSingletonEngine,
     )
-    from cudf_polars.experimental.rapidsmpf.frontend.spmd import SPMDEngine
+    from cudf_polars.experimental.frontend.spmd import SPMDEngine
 
     # 1) Construction runs on the worker thread.
     recorded: dict[str, threading.Thread] = {}
@@ -327,13 +327,13 @@ def _body_shutdown_timeout() -> None:
 
     import pytest
 
-    from cudf_polars.experimental.rapidsmpf.frontend import (
+    from cudf_polars.experimental.frontend import (
         default_singleton_engine as dse,
     )
-    from cudf_polars.experimental.rapidsmpf.frontend.default_singleton_engine import (
+    from cudf_polars.experimental.frontend.default_singleton_engine import (
         DefaultSingletonEngine,
     )
-    from cudf_polars.experimental.rapidsmpf.frontend.spmd import SPMDEngine
+    from cudf_polars.experimental.frontend.spmd import SPMDEngine
 
     release_worker = threading.Event()
     real_done = threading.Event()

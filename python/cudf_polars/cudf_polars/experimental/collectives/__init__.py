@@ -4,7 +4,7 @@
 
 from __future__ import annotations
 
-from cudf_polars.experimental.rapidsmpf.collectives.common import (
+from cudf_polars.experimental.collectives.common import (
     ReserveOpIDs,
     reserve_op_id,
 )

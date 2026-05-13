@@ -15,7 +15,7 @@ from typing import TYPE_CHECKING, Any, Literal
 from rapidsmpf.config import Options
 from rapidsmpf.utils.string import parse_boolean
 
-from cudf_polars.experimental.rapidsmpf.frontend.hardware_binding import (
+from cudf_polars.experimental.frontend.hardware_binding import (
     HardwareBindingPolicy,
 )
 from cudf_polars.utils.config import MemoryResourceConfig
@@ -261,7 +261,7 @@ class StreamingOptions:
         Category: engine.
     hardware_binding
         Hardware binding policy. Pass a
-        :class:`~cudf_polars.experimental.rapidsmpf.frontend.hardware_binding.HardwareBindingPolicy`
+        :class:`~cudf_polars.experimental.frontend.hardware_binding.HardwareBindingPolicy`
         instance for fine-grained control.
         Env: ``CUDF_POLARS__HARDWARE_BINDING`` (JSON object,
         e.g. ``'{"enabled": false}'``).

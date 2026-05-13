@@ -22,12 +22,12 @@ from cudf_polars import Translator
 from cudf_polars.containers import DataFrame, DataType
 from cudf_polars.dsl import expr
 from cudf_polars.dsl.ir import GroupBy, HStack, Projection, Select
-from cudf_polars.experimental.rapidsmpf.core import evaluate_logical_plan
-from cudf_polars.experimental.rapidsmpf.frontend.options import StreamingOptions
-from cudf_polars.experimental.rapidsmpf.utils import (
+from cudf_polars.experimental.actor_graph.core import evaluate_logical_plan
+from cudf_polars.experimental.actor_graph.utils import (
     NormalizedPartitioning,
     maybe_remap_partitioning,
 )
+from cudf_polars.experimental.frontend.options import StreamingOptions
 from cudf_polars.utils.config import ConfigOptions
 
 

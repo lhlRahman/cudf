@@ -19,8 +19,8 @@ from cudf_polars.dsl.ir import (
     Union,
 )
 from cudf_polars.dsl.traversal import CachingVisitor, traversal
-from cudf_polars.experimental.rapidsmpf.dispatch import FanoutInfo
-from cudf_polars.experimental.rapidsmpf.nodes import (
+from cudf_polars.experimental.actor_graph.dispatch import FanoutInfo
+from cudf_polars.experimental.actor_graph.nodes import (
     generate_ir_sub_network_wrapper,
     metadata_drain_node,
 )
@@ -39,12 +39,12 @@ if TYPE_CHECKING:
     import polars as pl
 
     from cudf_polars.dsl.ir import IR, IRExecutionContext
-    from cudf_polars.experimental.base import PartitionInfo, StatsCollector
-    from cudf_polars.experimental.parallel import ConfigOptions
-    from cudf_polars.experimental.rapidsmpf.dispatch import (
+    from cudf_polars.experimental.actor_graph.dispatch import (
         GenState,
         SubNetGenerator,
     )
+    from cudf_polars.experimental.base import PartitionInfo, StatsCollector
+    from cudf_polars.experimental.parallel import ConfigOptions
     from cudf_polars.utils.config import StreamingExecutor
 
 
@@ -73,7 +73,7 @@ def evaluate_logical_plan(
     # For default_singleton, inject the process-wide DefaultSingletonEngine instance
     # into config_options before treating it as a regular SPMDEngine.
     if config_options.executor.cluster == "default_singleton":
-        from cudf_polars.experimental.rapidsmpf.frontend.default_singleton_engine import (
+        from cudf_polars.experimental.frontend.default_singleton_engine import (
             DefaultSingletonEngine,
         )
 
@@ -96,7 +96,7 @@ def evaluate_logical_plan(
     ):
         match config_options.executor.cluster:
             case "spmd" | "default_singleton":
-                from cudf_polars.experimental.rapidsmpf.frontend.spmd import (
+                from cudf_polars.experimental.frontend.spmd import (
                     evaluate_pipeline_spmd_mode,
                 )
 
@@ -107,7 +107,7 @@ def evaluate_logical_plan(
                     query_id=query_id,
                 )
             case "ray":
-                from cudf_polars.experimental.rapidsmpf.frontend.ray import (
+                from cudf_polars.experimental.frontend.ray import (
                     evaluate_pipeline_ray_mode,
                 )
 
@@ -118,7 +118,7 @@ def evaluate_logical_plan(
                     query_id=query_id,
                 )
             case "dask":
-                from cudf_polars.experimental.rapidsmpf.frontend.dask import (
+                from cudf_polars.experimental.frontend.dask import (
                     evaluate_pipeline_dask_mode,
                 )
 

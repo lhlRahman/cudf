@@ -12,13 +12,13 @@ from rapidsmpf.bootstrap import is_running_with_rrun
 
 import polars as pl
 
-from cudf_polars.experimental.rapidsmpf.frontend.options import StreamingOptions
+from cudf_polars.experimental.frontend.options import StreamingOptions
 from cudf_polars.testing.asserts import assert_gpu_result_equal
 from cudf_polars.utils.config import DaskContext
 
 distributed = pytest.importorskip("distributed")
 
-from cudf_polars.experimental.rapidsmpf.frontend.dask import DaskEngine  # noqa: E402
+from cudf_polars.experimental.frontend.dask import DaskEngine  # noqa: E402
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -233,7 +233,7 @@ def test_reset_rejects_construction_time_engine_options(
     reset_engine: DaskEngine,
 ) -> None:
     """``_reset`` rejects ``engine_options`` keys read at worker setup."""
-    from cudf_polars.experimental.rapidsmpf.frontend.hardware_binding import (
+    from cudf_polars.experimental.frontend.hardware_binding import (
         HardwareBindingPolicy,
     )
 

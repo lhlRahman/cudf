@@ -54,8 +54,8 @@ if TYPE_CHECKING:
     from rmm.pylibrmm.stream import Stream
 
     from cudf_polars.dsl.ir import IR, IRExecutionContext
-    from cudf_polars.experimental.rapidsmpf.dispatch import SubNetGenerator
-    from cudf_polars.experimental.rapidsmpf.tracing import ActorTracer
+    from cudf_polars.experimental.actor_graph.dispatch import SubNetGenerator
+    from cudf_polars.experimental.actor_graph.tracing import ActorTracer
     from cudf_polars.typing import Schema
 
 
@@ -139,7 +139,7 @@ async def shutdown_on_error(
     # Create tracer only if LOG_TRACES is enabled and IR is provided
     tracer: ActorTracer | None = None
     contextvars: dict[str, Any] = {}
-    from cudf_polars.experimental.rapidsmpf.tracing import ActorTracer
+    from cudf_polars.experimental.actor_graph.tracing import ActorTracer
 
     ir_id = trace_ir.get_stable_id()
     ir_type = type(trace_ir).__name__

@@ -12,8 +12,8 @@ from rapidsmpf.streaming.cudf.table_chunk import TableChunk
 
 import pylibcudf as plc
 
-from cudf_polars.experimental.rapidsmpf.collectives.allgather import AllGatherManager
-from cudf_polars.experimental.rapidsmpf.utils import allgather_reduce
+from cudf_polars.experimental.actor_graph.utils import allgather_reduce
+from cudf_polars.experimental.collectives.allgather import AllGatherManager
 
 
 async def _test_allgather(engine) -> None:

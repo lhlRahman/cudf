@@ -17,10 +17,10 @@ from rapidsmpf.streaming.cudf.table_chunk import TableChunk
 
 import pylibcudf as plc
 
-from cudf_polars.experimental.rapidsmpf.frontend.options import StreamingOptions
-from cudf_polars.experimental.rapidsmpf.utils import (
+from cudf_polars.experimental.actor_graph.utils import (
     make_spill_function,
 )
+from cudf_polars.experimental.frontend.options import StreamingOptions
 
 if TYPE_CHECKING:
     from rmm.pylibrmm.stream import Stream

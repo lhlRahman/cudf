@@ -27,27 +27,15 @@ from cudf_polars.dsl.ir import (
     _prepare_parquet_predicate,
 )
 from cudf_polars.dsl.to_ast import to_parquet_filter
-from cudf_polars.experimental.base import (
-    IOPartitionFlavor,
-    IOPartitionPlan,
-    PartitionInfo,
-)
-from cudf_polars.experimental.io import (
-    SplitScan,
-    StreamingSink,
-    _prepare_sink_directory,
-    _sink_to_file,
-    scan_partition_plan,
-)
-from cudf_polars.experimental.rapidsmpf.dispatch import (
+from cudf_polars.experimental.actor_graph.dispatch import (
     generate_ir_sub_network,
 )
-from cudf_polars.experimental.rapidsmpf.nodes import (
+from cudf_polars.experimental.actor_graph.nodes import (
     define_actor,
     metadata_feeder_node,
     shutdown_on_error,
 )
-from cudf_polars.experimental.rapidsmpf.utils import (
+from cudf_polars.experimental.actor_graph.utils import (
     ChannelManager,
     chunk_to_frame,
     empty_table_chunk,
@@ -56,20 +44,28 @@ from cudf_polars.experimental.rapidsmpf.utils import (
     recv_metadata,
     send_metadata,
 )
+from cudf_polars.experimental.base import IOPartitionFlavor
+from cudf_polars.experimental.io import (
+    SplitScan,
+    StreamingSink,
+    _prepare_sink_directory,
+    _sink_to_file,
+)
 from cudf_polars.experimental.utils import _dynamic_planning_on
 
 if TYPE_CHECKING:
-    from collections.abc import MutableMapping
-
     from rapidsmpf.communicator.communicator import Communicator
     from rapidsmpf.streaming.core.channel import Channel
     from rapidsmpf.streaming.core.context import Context
 
     from cudf_polars.dsl.ir import IR, IRExecutionContext
-    from cudf_polars.experimental.base import StatsCollector
-    from cudf_polars.experimental.dispatch import LowerIRTransformer
-    from cudf_polars.experimental.rapidsmpf.core import SubNetGenerator
-    from cudf_polars.experimental.rapidsmpf.tracing import ActorTracer
+    from cudf_polars.experimental.actor_graph.core import SubNetGenerator
+    from cudf_polars.experimental.actor_graph.tracing import ActorTracer
+    from cudf_polars.experimental.base import (
+        IOPartitionPlan,
+        PartitionInfo,
+        StatsCollector,
+    )
     from cudf_polars.utils.config import ParquetOptions
 
 
@@ -127,24 +123,6 @@ class Lineariser:
             await self.ch_out.send(self.context, buffer.pop(seq))
 
         await self.ch_out.drain(self.context)
-
-
-def lower_dataframescan_rapidsmpf(
-    ir: DataFrameScan, rec: LowerIRTransformer
-) -> tuple[IR, MutableMapping[IR, PartitionInfo]]:
-    """Lower a DataFrameScan node for the RapidsMPF streaming runtime."""
-    config_options = rec.state["config_options"]
-
-    # NOTE: We calculate the expected partition count
-    # to help trigger fallback warnings in lower_ir_graph.
-    # The generate_ir_sub_network logic is NOT required
-    # to obey this partition count. However, the count
-    # WILL match after an IO operation (for now).
-    rows_per_partition = config_options.executor.max_rows_per_partition
-    nrows = max(ir.df.shape()[0], 1)
-    count = math.ceil(nrows / rows_per_partition)
-
-    return ir, {ir: PartitionInfo(count=count)}
 
 
 @define_actor()
@@ -315,37 +293,6 @@ def _(
         ]
     }
     return nodes, channels
-
-
-def lower_scan_rapidsmpf(
-    ir: Scan, rec: LowerIRTransformer
-) -> tuple[IR, MutableMapping[IR, PartitionInfo]]:
-    """Lower a Scan node for the RapidsMPF streaming runtime."""
-    config_options = rec.state["config_options"]
-    if (
-        ir.typ in ("csv", "parquet", "ndjson")
-        and ir.n_rows == -1
-        and ir.skip_rows == 0
-        and ir.row_index is None
-    ):
-        # NOTE: We calculate the expected partition count
-        # to help trigger fallback warnings in lower_ir_graph.
-        # The generate_ir_sub_network logic is NOT required
-        # to obey this partition count. However, the count
-        # WILL match after an IO operation (for now).
-        plan = scan_partition_plan(ir, rec.state["stats"], config_options)
-        paths = list(ir.paths)
-        if plan.flavor == IOPartitionFlavor.SPLIT_FILES:
-            count = plan.factor * len(paths)
-        else:
-            count = math.ceil(len(paths) / plan.factor)
-
-        return ir, {ir: PartitionInfo(count=count, io_plan=plan)}
-    else:
-        plan = IOPartitionPlan(
-            flavor=IOPartitionFlavor.SINGLE_READ, factor=len(ir.paths)
-        )
-        return ir, {ir: PartitionInfo(count=1, io_plan=plan)}
 
 
 async def read_chunk(

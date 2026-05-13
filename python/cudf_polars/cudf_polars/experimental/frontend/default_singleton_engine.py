@@ -16,10 +16,10 @@ from rapidsmpf.communicator.single import (
 )
 from rapidsmpf.progress_thread import ProgressThread
 
-from cudf_polars.experimental.rapidsmpf.frontend.core import (
+from cudf_polars.experimental.frontend.core import (
     resolve_rapidsmpf_options,
 )
-from cudf_polars.experimental.rapidsmpf.frontend.spmd import SPMDEngine
+from cudf_polars.experimental.frontend.spmd import SPMDEngine
 
 if TYPE_CHECKING:
     from collections.abc import Callable

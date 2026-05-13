@@ -21,14 +21,12 @@ from cudf_polars.containers import DataFrame, DataType
 from cudf_polars.dsl.expr import Col, NamedExpr
 from cudf_polars.dsl.ir import Empty, Sort
 from cudf_polars.dsl.utils.naming import unique_names
-from cudf_polars.experimental.rapidsmpf.collectives.allgather import AllGatherManager
-from cudf_polars.experimental.rapidsmpf.collectives.shuffle import ShuffleManager
-from cudf_polars.experimental.rapidsmpf.dispatch import generate_ir_sub_network
-from cudf_polars.experimental.rapidsmpf.nodes import (
+from cudf_polars.experimental.actor_graph.dispatch import generate_ir_sub_network
+from cudf_polars.experimental.actor_graph.nodes import (
     default_node_single,
     shutdown_on_error,
 )
-from cudf_polars.experimental.rapidsmpf.utils import (
+from cudf_polars.experimental.actor_graph.utils import (
     ChannelManager,
     allgather_reduce,
     chunk_to_frame,
@@ -43,6 +41,8 @@ from cudf_polars.experimental.rapidsmpf.utils import (
     replay_buffered_channel,
     send_metadata,
 )
+from cudf_polars.experimental.collectives.allgather import AllGatherManager
+from cudf_polars.experimental.collectives.shuffle import ShuffleManager
 from cudf_polars.experimental.repartition import Repartition
 from cudf_polars.experimental.sort import (
     _get_final_sort_boundaries,
@@ -60,8 +60,8 @@ if TYPE_CHECKING:
     from rapidsmpf.streaming.core.context import Context
 
     from cudf_polars.dsl.ir import IRExecutionContext
-    from cudf_polars.experimental.rapidsmpf.dispatch import SubNetGenerator
-    from cudf_polars.experimental.rapidsmpf.tracing import ActorTracer
+    from cudf_polars.experimental.actor_graph.dispatch import SubNetGenerator
+    from cudf_polars.experimental.actor_graph.tracing import ActorTracer
     from cudf_polars.typing import Schema
     from cudf_polars.utils.config import StreamingExecutor
 

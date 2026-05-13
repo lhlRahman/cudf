@@ -16,11 +16,11 @@ if TYPE_CHECKING:
     from rapidsmpf.streaming.core.context import Context
 
     from cudf_polars.dsl.ir import IR, IRExecutionContext
+    from cudf_polars.experimental.actor_graph.utils import ChannelManager
     from cudf_polars.experimental.base import (
         PartitionInfo,
         StatsCollector,
     )
-    from cudf_polars.experimental.rapidsmpf.utils import ChannelManager
     from cudf_polars.utils.config import ConfigOptions, StreamingExecutor
 
 

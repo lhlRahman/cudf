@@ -122,7 +122,7 @@ def evaluate_streaming(
     # Clear source info cache in case data was overwritten
     _clear_source_info_cache()
 
-    from cudf_polars.experimental.rapidsmpf.core import evaluate_logical_plan
+    from cudf_polars.experimental.actor_graph.core import evaluate_logical_plan
 
     result, _ = evaluate_logical_plan(ir, config_options, collect_metadata=False)
     return result

@@ -58,9 +58,18 @@ if TYPE_CHECKING:
 def _(
     ir: DataFrameScan, rec: LowerIRTransformer
 ) -> tuple[IR, MutableMapping[IR, PartitionInfo]]:
-    from cudf_polars.experimental.rapidsmpf.io import lower_dataframescan_rapidsmpf
+    config_options = rec.state["config_options"]
 
-    return lower_dataframescan_rapidsmpf(ir, rec)
+    # NOTE: We calculate the expected partition count
+    # to help trigger fallback warnings in lower_ir_graph.
+    # The generate_ir_sub_network logic is NOT required
+    # to obey this partition count. However, the count
+    # WILL match after an IO operation (for now).
+    rows_per_partition = config_options.executor.max_rows_per_partition
+    nrows = max(ir.df.shape()[0], 1)
+    count = math.ceil(nrows / rows_per_partition)
+
+    return ir, {ir: PartitionInfo(count=count)}
 
 
 def scan_partition_plan(
@@ -254,9 +263,31 @@ def _(
 def _(
     ir: Scan, rec: LowerIRTransformer
 ) -> tuple[IR, MutableMapping[IR, PartitionInfo]]:
-    from cudf_polars.experimental.rapidsmpf.io import lower_scan_rapidsmpf
+    config_options = rec.state["config_options"]
+    if (
+        ir.typ in ("csv", "parquet", "ndjson")
+        and ir.n_rows == -1
+        and ir.skip_rows == 0
+        and ir.row_index is None
+    ):
+        # NOTE: We calculate the expected partition count
+        # to help trigger fallback warnings in lower_ir_graph.
+        # The generate_ir_sub_network logic is NOT required
+        # to obey this partition count. However, the count
+        # WILL match after an IO operation (for now).
+        plan = scan_partition_plan(ir, rec.state["stats"], config_options)
+        paths = list(ir.paths)
+        if plan.flavor == IOPartitionFlavor.SPLIT_FILES:
+            count = plan.factor * len(paths)
+        else:
+            count = math.ceil(len(paths) / plan.factor)
 
-    return lower_scan_rapidsmpf(ir, rec)
+        return ir, {ir: PartitionInfo(count=count, io_plan=plan)}
+    else:
+        plan = IOPartitionPlan(
+            flavor=IOPartitionFlavor.SINGLE_READ, factor=len(ir.paths)
+        )
+        return ir, {ir: PartitionInfo(count=1, io_plan=plan)}
 
 
 class StreamingSink(IR):

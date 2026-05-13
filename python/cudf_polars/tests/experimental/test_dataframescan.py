@@ -11,8 +11,8 @@ import polars as pl
 
 from cudf_polars import Translator
 from cudf_polars.dsl.traversal import traversal
+from cudf_polars.experimental.frontend.options import StreamingOptions
 from cudf_polars.experimental.parallel import lower_ir_graph
-from cudf_polars.experimental.rapidsmpf.frontend.options import StreamingOptions
 from cudf_polars.experimental.statistics import collect_statistics
 from cudf_polars.testing.asserts import assert_gpu_result_equal
 from cudf_polars.utils.config import ConfigOptions

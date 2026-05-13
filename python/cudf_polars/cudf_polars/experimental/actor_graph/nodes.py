@@ -20,10 +20,10 @@ from rapidsmpf.streaming.cudf.table_chunk import (
 
 from cudf_polars.containers import DataFrame
 from cudf_polars.dsl.ir import IR, Empty
-from cudf_polars.experimental.rapidsmpf.dispatch import (
+from cudf_polars.experimental.actor_graph.dispatch import (
     generate_ir_sub_network,
 )
-from cudf_polars.experimental.rapidsmpf.utils import (
+from cudf_polars.experimental.actor_graph.utils import (
     ChannelManager,
     chunkwise_evaluate,
     empty_table_chunk,
@@ -42,7 +42,7 @@ if TYPE_CHECKING:
     from rapidsmpf.streaming.core.context import Context
 
     from cudf_polars.dsl.ir import IRExecutionContext
-    from cudf_polars.experimental.rapidsmpf.dispatch import SubNetGenerator
+    from cudf_polars.experimental.actor_graph.dispatch import SubNetGenerator
 
 
 @define_actor()

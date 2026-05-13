@@ -108,7 +108,7 @@ def assert_gpu_result_equal(
     if (
         engine.config.get("executor_options", {}).get("cluster") == "spmd"
     ):  # pragma: no cover
-        from cudf_polars.experimental.rapidsmpf.frontend.spmd import (
+        from cudf_polars.experimental.frontend.spmd import (
             SPMDEngine,
             allgather_polars_dataframe,
         )

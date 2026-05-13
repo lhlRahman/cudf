@@ -9,7 +9,7 @@ import pytest
 
 import polars as pl
 
-from cudf_polars.experimental.rapidsmpf.frontend.options import StreamingOptions
+from cudf_polars.experimental.frontend.options import StreamingOptions
 from cudf_polars.testing.asserts import assert_sink_result_equal
 
 

@@ -11,11 +11,11 @@ from rapidsmpf.streaming.cudf.channel_metadata import ChannelMetadata
 from rapidsmpf.streaming.cudf.table_chunk import TableChunk
 
 from cudf_polars.dsl.ir import Union
-from cudf_polars.experimental.rapidsmpf.dispatch import (
+from cudf_polars.experimental.actor_graph.dispatch import (
     generate_ir_sub_network,
 )
-from cudf_polars.experimental.rapidsmpf.nodes import define_actor, shutdown_on_error
-from cudf_polars.experimental.rapidsmpf.utils import (
+from cudf_polars.experimental.actor_graph.nodes import define_actor, shutdown_on_error
+from cudf_polars.experimental.actor_graph.utils import (
     ChannelManager,
     gather_in_task_group,
     process_children,
@@ -29,7 +29,7 @@ if TYPE_CHECKING:
     from rapidsmpf.streaming.core.context import Context
 
     from cudf_polars.dsl.ir import IR, IRExecutionContext
-    from cudf_polars.experimental.rapidsmpf.core import SubNetGenerator
+    from cudf_polars.experimental.actor_graph.core import SubNetGenerator
 
 
 @define_actor()

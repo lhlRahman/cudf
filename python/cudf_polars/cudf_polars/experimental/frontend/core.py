@@ -25,13 +25,13 @@ import polars as pl
 
 from cudf_polars.containers import DataFrame
 from cudf_polars.dsl.ir import IRExecutionContext
+from cudf_polars.experimental.actor_graph.core import generate_network
+from cudf_polars.experimental.actor_graph.tracing import log_query_plan
+from cudf_polars.experimental.actor_graph.utils import empty_table_chunk
 from cudf_polars.experimental.base import StatsCollector
+from cudf_polars.experimental.collectives import ReserveOpIDs
+from cudf_polars.experimental.collectives.common import reserve_op_id
 from cudf_polars.experimental.parallel import lower_ir_graph
-from cudf_polars.experimental.rapidsmpf.collectives import ReserveOpIDs
-from cudf_polars.experimental.rapidsmpf.collectives.common import reserve_op_id
-from cudf_polars.experimental.rapidsmpf.core import generate_network
-from cudf_polars.experimental.rapidsmpf.tracing import log_query_plan
-from cudf_polars.experimental.rapidsmpf.utils import empty_table_chunk
 from cudf_polars.experimental.statistics import collect_statistics
 from cudf_polars.experimental.utils import _concat
 
@@ -169,7 +169,7 @@ class StreamingEngine(pl.GPUEngine):
     ):
         # Refuse to construct if a ``DefaultSingletonEngine`` is alive
         # (no-op for the singleton itself).
-        from cudf_polars.experimental.rapidsmpf.frontend.default_singleton_engine import (
+        from cudf_polars.experimental.frontend.default_singleton_engine import (
             check_no_live_default_singleton,
         )
 

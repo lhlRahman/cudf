@@ -12,10 +12,10 @@ import polars as pl
 from cudf_polars import Translator
 from cudf_polars.dsl.ir import Cache, Join
 from cudf_polars.dsl.traversal import traversal
+from cudf_polars.experimental.actor_graph.join import _use_pwise_join
 from cudf_polars.experimental.base import PartitionInfo
+from cudf_polars.experimental.frontend.options import StreamingOptions
 from cudf_polars.experimental.parallel import lower_ir_graph
-from cudf_polars.experimental.rapidsmpf.frontend.options import StreamingOptions
-from cudf_polars.experimental.rapidsmpf.join import _use_pwise_join
 from cudf_polars.experimental.shuffle import Shuffle
 from cudf_polars.experimental.statistics import collect_statistics
 from cudf_polars.testing.asserts import assert_gpu_result_equal

@@ -17,15 +17,15 @@ from rapidsmpf.streaming.cudf.table_chunk import (
 )
 
 from cudf_polars.containers import DataFrame
-from cudf_polars.experimental.rapidsmpf.collectives.allgather import AllGatherManager
-from cudf_polars.experimental.rapidsmpf.dispatch import generate_ir_sub_network
-from cudf_polars.experimental.rapidsmpf.nodes import shutdown_on_error
-from cudf_polars.experimental.rapidsmpf.utils import (
+from cudf_polars.experimental.actor_graph.dispatch import generate_ir_sub_network
+from cudf_polars.experimental.actor_graph.nodes import shutdown_on_error
+from cudf_polars.experimental.actor_graph.utils import (
     ChannelManager,
     empty_table_chunk,
     recv_metadata,
     send_metadata,
 )
+from cudf_polars.experimental.collectives.allgather import AllGatherManager
 from cudf_polars.experimental.repartition import Repartition
 from cudf_polars.experimental.utils import _concat
 
@@ -35,7 +35,7 @@ if TYPE_CHECKING:
     from rapidsmpf.streaming.core.context import Context
 
     from cudf_polars.dsl.ir import IR, IRExecutionContext
-    from cudf_polars.experimental.rapidsmpf.dispatch import SubNetGenerator
+    from cudf_polars.experimental.actor_graph.dispatch import SubNetGenerator
 
 
 @define_actor()

@@ -10,7 +10,7 @@ import os
 
 import pytest
 
-from cudf_polars.experimental.rapidsmpf.frontend.options import (
+from cudf_polars.experimental.frontend.options import (
     UNSPECIFIED,
     StreamingOptions,
     Unspecified,
@@ -150,7 +150,7 @@ def test_rapidsmpf_options_env_var_absent(monkeypatch: pytest.MonkeyPatch) -> No
 
 def test_parse_memory_resource_config() -> None:
     """_parse_memory_resource_config converts a JSON string to MemoryResourceConfig."""
-    from cudf_polars.experimental.rapidsmpf.frontend.options import (
+    from cudf_polars.experimental.frontend.options import (
         _parse_memory_resource_config,
     )
 
@@ -337,7 +337,7 @@ def test_to_dict_roundtrip_empty() -> None:
 
 
 def test_hardware_binding_in_engine_options() -> None:
-    from cudf_polars.experimental.rapidsmpf.frontend.hardware_binding import (
+    from cudf_polars.experimental.frontend.hardware_binding import (
         HardwareBindingPolicy,
     )
 
@@ -348,7 +348,7 @@ def test_hardware_binding_in_engine_options() -> None:
 
 
 def test_hardware_binding_env_var_disabled(monkeypatch: pytest.MonkeyPatch) -> None:
-    from cudf_polars.experimental.rapidsmpf.frontend.hardware_binding import (
+    from cudf_polars.experimental.frontend.hardware_binding import (
         HardwareBindingPolicy,
     )
 
@@ -358,7 +358,7 @@ def test_hardware_binding_env_var_disabled(monkeypatch: pytest.MonkeyPatch) -> N
 
 
 def test_hardware_binding_cli_json() -> None:
-    from cudf_polars.experimental.rapidsmpf.frontend.hardware_binding import (
+    from cudf_polars.experimental.frontend.hardware_binding import (
         HardwareBindingPolicy,
     )
 
@@ -376,7 +376,7 @@ def test_hardware_binding_invalid_json(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 def test_hardware_binding_cli_disabled() -> None:
-    from cudf_polars.experimental.rapidsmpf.frontend.hardware_binding import (
+    from cudf_polars.experimental.frontend.hardware_binding import (
         HardwareBindingPolicy,
     )
 

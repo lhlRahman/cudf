@@ -15,8 +15,8 @@ from cudf_polars.dsl.expr import Col
 from cudf_polars.dsl.expressions.base import ExecutionContext
 from cudf_polars.dsl.ir import Filter, HStack
 from cudf_polars.dsl.traversal import traversal
+from cudf_polars.experimental.frontend.options import StreamingOptions
 from cudf_polars.experimental.parallel import lower_ir_graph
-from cudf_polars.experimental.rapidsmpf.frontend.options import StreamingOptions
 from cudf_polars.experimental.repartition import Repartition
 from cudf_polars.experimental.statistics import collect_statistics
 from cudf_polars.testing.asserts import assert_gpu_result_equal

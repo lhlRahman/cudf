@@ -9,12 +9,12 @@ from typing import TYPE_CHECKING
 import pytest
 from rapidsmpf.statistics import Statistics
 
-from cudf_polars.experimental.rapidsmpf.frontend.options import StreamingOptions
+from cudf_polars.experimental.frontend.options import StreamingOptions
 
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from cudf_polars.experimental.rapidsmpf.frontend.core import StreamingEngine
+    from cudf_polars.experimental.frontend.core import StreamingEngine
 
 # Runs the spmd variant even under rrun with nranks > 1. The ray/dask
 # variants skip themselves in that environment.

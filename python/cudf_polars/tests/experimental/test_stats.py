@@ -15,12 +15,12 @@ from cudf_polars import Translator
 from cudf_polars.containers import DataType
 from cudf_polars.dsl.ir import Empty, Projection
 from cudf_polars.experimental.base import SerializedDataSourceInfo, StatsCollector
+from cudf_polars.experimental.frontend.options import StreamingOptions
 from cudf_polars.experimental.io import (
     DataFrameSourceInfo,
     ParquetSourceInfo,
     _clear_source_info_cache,
 )
-from cudf_polars.experimental.rapidsmpf.frontend.options import StreamingOptions
 from cudf_polars.experimental.statistics import collect_statistics
 from cudf_polars.testing.asserts import assert_gpu_result_equal
 from cudf_polars.testing.io import make_lazy_frame, make_partitioned_source
