@@ -7,17 +7,45 @@ converts expressions into an optimized query plan and determines whether the pla
 on the GPU. If it is not, the execution transparently falls back to the standard Polars engine
 and runs on the CPU.
 
-`cudf-polars` ships three explicit streaming GPU engines
-({class}`~cudf_polars.experimental.rapidsmpf.frontend.ray.RayEngine`,
-{class}`~cudf_polars.experimental.rapidsmpf.frontend.dask.DaskEngine`,
-{class}`~cudf_polars.experimental.rapidsmpf.frontend.spmd.SPMDEngine`) plus the default
-`engine="gpu"`. All four share the same streaming executor, conceptually similar to
-[Polars' own streaming engine](https://docs.pola.rs/user-guide/concepts/streaming/) but on the
-GPU. We recommend constructing one explicitly; Ray is the showcased example throughout these
-docs. When no engine is constructed, `engine="gpu"` bootstraps a single-GPU streaming runtime
-on first use and reuses it across queries. A separate non-streaming in-memory path remains
-available for small queries, debugging, and `LazyFrame.profile`. See {doc}`engines` for the
-conceptual overview, and {doc}`usage` to get started.
+## Install
+
+Follow the [RAPIDS installation guide](https://docs.rapids.ai/install) and pick the
+`cudf-polars` package for your CUDA and Python versions. For example, with conda:
+
+```bash
+conda install -c rapidsai -c conda-forge -c nvidia cudf-polars
+```
+
+Or with pip (CUDA 13 wheels; use `cudf-polars-cu12` for CUDA 12):
+
+```bash
+pip install --extra-index-url=https://pypi.nvidia.com cudf-polars-cu13
+```
+
+## Quick start
+
+{class}`~cudf_polars.experimental.rapidsmpf.frontend.ray.RayEngine` with no arguments uses
+every GPU visible to the process, so the same code runs on one GPU and scales to multi-GPU /
+multi-node setups automatically:
+
+```python
+import polars as pl
+from cudf_polars.experimental.rapidsmpf.frontend.ray import RayEngine
+
+query = (
+    pl.scan_parquet("/data/dataset/*.parquet")
+    .filter(pl.col("amount") > 100)
+    .group_by("customer_id")
+    .agg(pl.col("amount").sum())
+)
+
+with RayEngine() as engine:
+    result = query.collect(engine=engine)
+```
+
+See {doc}`usage` for the full tutorial, {doc}`engines` for a conceptual overview of the
+available engines, and {doc}`options` for the
+{class}`~cudf_polars.experimental.rapidsmpf.frontend.options.StreamingOptions` configuration.
 
 ## Benchmark
 
