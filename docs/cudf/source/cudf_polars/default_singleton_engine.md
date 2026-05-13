@@ -1,20 +1,17 @@
 (cudf-polars-default-singleton-engine)=
-# DefaultSingletonEngine
+# Default `engine="gpu"`
 
-{class}`~cudf_polars.experimental.rapidsmpf.frontend.default_singleton_engine.DefaultSingletonEngine`
-is a process-wide singleton specialization of
-{class}`~cudf_polars.experimental.rapidsmpf.frontend.spmd.SPMDEngine` that backs the streaming
-executor when the user has *not* constructed an engine explicitly. At most one live instance
-exists per process; it is created lazily on first use and torn down at interpreter exit.
-
-`DefaultSingletonEngine` is a streaming engine: it runs the same streaming executor as
-{class}`~cudf_polars.experimental.rapidsmpf.frontend.ray.RayEngine`,
-{class}`~cudf_polars.experimental.rapidsmpf.frontend.dask.DaskEngine`, and
-{class}`~cudf_polars.experimental.rapidsmpf.frontend.spmd.SPMDEngine` (conceptually similar to
-[Polars' own streaming engine](https://docs.pola.rs/user-guide/concepts/streaming/), on the
-GPU). The single-GPU singleton form is what you get without configuring a cluster. Ray is the
-showcased explicit engine (see {doc}`usage`); this page is for understanding what you get
-*without* constructing one.
+`.collect(engine="gpu")` (and `engine=pl.GPUEngine()`) is the API users invoke when they don't
+construct a streaming engine explicitly. It runs the same streaming executor as the explicit
+engines (Ray, Dask, SPMD), conceptually similar to
+[Polars' own streaming engine](https://docs.pola.rs/user-guide/concepts/streaming/) but on the
+GPU. Under the hood it's backed by
+{class}`~cudf_polars.experimental.rapidsmpf.frontend.default_singleton_engine.DefaultSingletonEngine`,
+a process-wide singleton specialization of
+{class}`~cudf_polars.experimental.rapidsmpf.frontend.spmd.SPMDEngine`. At most one live
+instance exists per process; it is created lazily on first use and torn down at interpreter
+exit. Ray is the showcased explicit engine (see {doc}`usage`); this page documents what
+`engine="gpu"` does *without* you having to construct anything.
 
 ```{important}
 For any non-trivial workflow, construct an engine explicitly. For example,
@@ -55,11 +52,11 @@ from cudf_polars.experimental.rapidsmpf.frontend.default_singleton_engine import
     DefaultSingletonEngine,
 )
 
-engine = DefaultSingletonEngine.create_or_get()
+engine = DefaultSingletonEngine.get_or_create()
 result = query.collect(engine=engine)
 ```
 
-`create_or_get()` is idempotent: calling it again returns the same instance.
+`get_or_create()` is idempotent: calling it again returns the same instance.
 
 For anything beyond defaults, prefer an explicit engine — see {doc}`usage`.
 
@@ -91,7 +88,7 @@ process. Concretely:
 
 - Constructing `RayEngine` / `DaskEngine` / `SPMDEngine` while the singleton is alive raises
   `RuntimeError`.
-- `DefaultSingletonEngine.create_or_get()` raises `RuntimeError` if any explicit streaming
+- `DefaultSingletonEngine.get_or_create()` raises `RuntimeError` if any explicit streaming
   engine is alive.
 
 Recommended pattern: pick one engine for the lifetime of the program. If you need to switch,
@@ -104,7 +101,7 @@ explicit_engine = SPMDEngine.from_options(opts)
 
 ## No options
 
-`DefaultSingletonEngine.create_or_get()` takes no arguments. To tune `StreamingOptions` —
+`DefaultSingletonEngine.get_or_create()` takes no arguments. To tune `StreamingOptions` —
 e.g. `spill_to_pinned_memory`, `fallback_mode`, `max_rows_per_partition`, or any rapidsmpf
 runtime knob — construct an explicit
 {class}`~cudf_polars.experimental.rapidsmpf.frontend.ray.RayEngine`,

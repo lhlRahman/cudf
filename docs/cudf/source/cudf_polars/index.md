@@ -7,18 +7,17 @@ converts expressions into an optimized query plan and determines whether the pla
 on the GPU. If it is not, the execution transparently falls back to the standard Polars engine
 and runs on the CPU.
 
-`cudf-polars` ships four streaming GPU engines
+`cudf-polars` ships three explicit streaming GPU engines
 ({class}`~cudf_polars.experimental.rapidsmpf.frontend.ray.RayEngine`,
 {class}`~cudf_polars.experimental.rapidsmpf.frontend.dask.DaskEngine`,
-{class}`~cudf_polars.experimental.rapidsmpf.frontend.spmd.SPMDEngine`, and an implicit
-{class}`~cudf_polars.experimental.rapidsmpf.frontend.default_singleton_engine.DefaultSingletonEngine`)
-that share the same streaming executor, conceptually similar to
+{class}`~cudf_polars.experimental.rapidsmpf.frontend.spmd.SPMDEngine`) plus the default
+`engine="gpu"`. All four share the same streaming executor, conceptually similar to
 [Polars' own streaming engine](https://docs.pola.rs/user-guide/concepts/streaming/) but on the
 GPU. We recommend constructing one explicitly; Ray is the showcased example throughout these
-docs. When no engine is constructed, cudf-polars uses the implicit `DefaultSingletonEngine` and
-bootstraps a single-GPU streaming runtime on first use. A separate non-streaming in-memory path
-remains available for small queries, debugging, and `LazyFrame.profile`. See {doc}`engines` for
-the conceptual overview, and {doc}`usage` to get started.
+docs. When no engine is constructed, `engine="gpu"` bootstraps a single-GPU streaming runtime
+on first use and reuses it across queries. A separate non-streaming in-memory path remains
+available for small queries, debugging, and `LazyFrame.profile`. See {doc}`engines` for the
+conceptual overview, and {doc}`usage` to get started.
 
 ## Benchmark
 

@@ -6,10 +6,9 @@
 When a query runs on a streaming engine
 ({class}`~cudf_polars.experimental.rapidsmpf.frontend.ray.RayEngine`,
 {class}`~cudf_polars.experimental.rapidsmpf.frontend.dask.DaskEngine`,
-{class}`~cudf_polars.experimental.rapidsmpf.frontend.spmd.SPMDEngine`, or the implicit
-{class}`~cudf_polars.experimental.rapidsmpf.frontend.default_singleton_engine.DefaultSingletonEngine`),
-the underlying streaming runtime can record detailed per-rank statistics: shuffle byte counts,
-allgather participation, memory-pool high-water marks, and more. See the
+{class}`~cudf_polars.experimental.rapidsmpf.frontend.spmd.SPMDEngine`, or the default
+`engine="gpu"`), the underlying streaming runtime can record detailed per-rank statistics:
+shuffle byte counts, allgather participation, memory-pool high-water marks, and more. See the
 [underlying statistics reference][rapidsmpf-stats] for the full list of metrics.
 
 Statistics collection is off by default. Enable it by setting `statistics=True` on

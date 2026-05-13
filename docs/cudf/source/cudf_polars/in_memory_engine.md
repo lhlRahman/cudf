@@ -15,14 +15,10 @@ For most workflows, prefer a streaming engine. Use the in-memory engine when:
 result = query.collect(engine="in-memory")
 ```
 
-This is the path documented in Polars' own [GPU support guide][polars-gpu].
-
-```{note}
-`engine="gpu"` and `engine=pl.GPUEngine()` no longer select this path. They use the implicit
-{class}`~cudf_polars.experimental.rapidsmpf.frontend.default_singleton_engine.DefaultSingletonEngine`
-(streaming on a single GPU; see {doc}`default_singleton_engine`). The singleton accepts no
-options, so for anything beyond a quick script, construct an explicit engine.
-```
+This is the path documented in Polars' own [GPU support guide][polars-gpu]. By contrast,
+`engine="gpu"` (or `engine=pl.GPUEngine()`) selects the default streaming path on a single GPU
+(see {doc}`default_singleton_engine`). That default accepts no options, so for anything beyond
+a quick script, construct an explicit engine.
 
 ## Configuration
 
