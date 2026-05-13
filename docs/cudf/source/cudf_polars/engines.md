@@ -56,7 +56,7 @@ coordinated:
 | {class}`~cudf_polars.experimental.rapidsmpf.frontend.ray.RayEngine`                                          | Single-client driver; one Ray actor per GPU                         | [Ray][ray-docs]          | Works from a laptop to a cloud cluster. No separate cluster setup needed.         |
 | {class}`~cudf_polars.experimental.rapidsmpf.frontend.dask.DaskEngine`                                        | Single-client driver; one Dask worker per GPU                       | [Dask distributed][dask] | Teams with an existing Dask deployment or a preferred Dask launcher.              |
 | {class}`~cudf_polars.experimental.rapidsmpf.frontend.spmd.SPMDEngine`                                        | Same script runs once per GPU, joined by a communicator             | UCXX (under `rrun`)      | HPC / SPMD launchers such as `rrun`. Single-rank mode needs no cluster at all.    |
-| {class}`~cudf_polars.experimental.rapidsmpf.frontend.default_singleton_engine.DefaultSingletonEngine`        | Implicit process-wide singleton on one GPU; no cluster              | None                     | Default when no engine is constructed. Short scripts and notebooks. No options.   |
+| {class}`~cudf_polars.experimental.rapidsmpf.frontend.default_singleton_engine.DefaultSingletonEngine`        | Implicit process-wide singleton on one GPU; no cluster              | None                     | Default when `engine="gpu"`. Short scripts and notebooks. No options.   |
 
 All four approaches use the same execution model under the hood, so which to select depends
 on your preferred deployment method, not performance tradeoffs. For any non-trivial workflow,

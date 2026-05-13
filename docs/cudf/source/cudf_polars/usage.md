@@ -5,7 +5,7 @@
 an `engine=` argument to `.collect()` or `.sink_*()`. See {doc}`engines` for the conceptual
 picture; this page walks through running your first query.
 
-We recommend constructing an engine explicitly even on a single GPU. The engine constructor is
+We always recommend constructing an engine object and using them in a context manager to ensure proper resource cleanup. The engine constructor is
 where you specify {class}`~cudf_polars.experimental.rapidsmpf.frontend.options.StreamingOptions`
 such as `spill_to_pinned_memory` or `fallback_mode`. Ray is the showcased example below; see also
 {doc}`other_engines`.
