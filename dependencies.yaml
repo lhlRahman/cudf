@@ -212,6 +212,7 @@ files:
       - test_python_cudf_common
       - test_python_cudf
       - test_python_s3
+      - test_python_cublaslt
   py_build_libcudf:
     output: pyproject
     pyproject_dir: python/libcudf
@@ -1364,3 +1365,8 @@ dependencies:
       - output_types: [conda, requirements, pyproject]
         packages:
           - structlog
+  test_python_cublaslt:
+    common:
+      - output_types: requirements
+        packages:
+          - cuda-toolkit[cublas]
