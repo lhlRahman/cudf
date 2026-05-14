@@ -19,7 +19,7 @@ conda install -c rapidsai -c conda-forge -c nvidia cudf-polars
 Or with pip (CUDA 13 wheels; use `cudf-polars-cu12` for CUDA 12):
 
 ```bash
-pip install --extra-index-url=https://pypi.nvidia.com cudf-polars-cu13
+pip install cudf-polars-cu13
 ```
 
 ## Quick start
