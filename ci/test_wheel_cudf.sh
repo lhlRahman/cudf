@@ -13,6 +13,42 @@ CUDF_WHEELHOUSE=$(rapids-download-from-github "$(rapids-package-name "wheel_pyth
 LIBCUDF_WHEELHOUSE=$(RAPIDS_PY_WHEEL_NAME="libcudf_${RAPIDS_PY_CUDA_SUFFIX}" rapids-download-wheels-from-github cpp)
 PYLIBCUDF_WHEELHOUSE=$(rapids-download-from-github "$(rapids-package-name "wheel_python" pylibcudf --stable --cuda "$RAPIDS_CUDA_VERSION")")
 
+function ensure_cublaslt_symlink()
+{
+    rapids-logger "Ensure libcublasLt.so symlink exists"
+    python - <<'PY'
+import sysconfig
+from pathlib import Path
+
+site_packages = {
+    Path(path)
+    for key in ("purelib", "platlib")
+    if (path := sysconfig.get_path(key)) is not None
+}
+
+for site_package in sorted(path for path in site_packages if path.is_dir()):
+    for soname in ("libcublasLt.so.13", "libcublasLt.so.12"):
+        matches = sorted(site_package.rglob(soname))
+        if not matches:
+            continue
+
+        lib = matches[0]
+        symlink = lib.with_name("libcublasLt.so")
+
+        if symlink.is_symlink():
+            symlink.unlink()
+        elif symlink.exists():
+            print(f"{symlink} already exists and is not a symlink; leaving it in place")
+            raise SystemExit(0)
+
+        symlink.symlink_to(lib.name)
+        print(f"Created {symlink} -> {lib.name}")
+        raise SystemExit(0)
+
+print("No libcublasLt.so.12 or libcublasLt.so.13 found in site-packages; skipping")
+PY
+}
+
 rapids-logger "Install pylibcudf and its basic dependencies in a virtual environment"
 
 # generate constraints (possibly pinning to oldest support versions of dependencies)
@@ -40,6 +76,8 @@ rapids-pip-retry install \
     "$(echo "${PYLIBCUDF_WHEELHOUSE}"/pylibcudf_"${RAPIDS_PY_CUDA_SUFFIX}"*.whl)[test]"\
     "cuda-toolkit[cublas]"
 
+ensure_cublaslt_symlink
+
 rapids-logger "pytest pylibcudf without optional dependencies"
 pushd python/pylibcudf/tests
 timeout 30m python -m pytest \
@@ -66,6 +104,8 @@ rapids-pip-retry install \
     "$(echo "${CUDF_WHEELHOUSE}"/cudf_"${RAPIDS_PY_CUDA_SUFFIX}"*.whl)[test]" \
     "$(echo "${LIBCUDF_WHEELHOUSE}"/libcudf_"${RAPIDS_PY_CUDA_SUFFIX}"*.whl)" \
     "$(echo "${PYLIBCUDF_WHEELHOUSE}"/pylibcudf_"${RAPIDS_PY_CUDA_SUFFIX}"*.whl)[test, pyarrow, numpy]"
+
+ensure_cublaslt_symlink
 
 rapids-logger "pytest pylibcudf"
 pushd python/pylibcudf/tests
