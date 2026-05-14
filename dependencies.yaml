@@ -1369,4 +1369,4 @@ dependencies:
     common:
       - output_types: requirements
         packages:
-          - cuda-toolkit[cublas]
+          - nvidia-cublas
