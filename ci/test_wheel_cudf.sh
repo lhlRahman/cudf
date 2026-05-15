@@ -37,7 +37,8 @@ rapids-pip-retry install \
     --prefer-binary \
     --constraint "${PIP_CONSTRAINT}" \
     "$(echo "${LIBCUDF_WHEELHOUSE}"/libcudf_"${RAPIDS_PY_CUDA_SUFFIX}"*.whl)" \
-    "$(echo "${PYLIBCUDF_WHEELHOUSE}"/pylibcudf_"${RAPIDS_PY_CUDA_SUFFIX}"*.whl)[test]"
+    "$(echo "${PYLIBCUDF_WHEELHOUSE}"/pylibcudf_"${RAPIDS_PY_CUDA_SUFFIX}"*.whl)[test]"\
+    "cuda-toolkit[cublas]"
 
 rapids-logger "pytest pylibcudf without optional dependencies"
 pushd python/pylibcudf/tests
