@@ -13,12 +13,27 @@ CUDF_WHEELHOUSE=$(rapids-download-from-github "$(rapids-package-name "wheel_pyth
 LIBCUDF_WHEELHOUSE=$(RAPIDS_PY_WHEEL_NAME="libcudf_${RAPIDS_PY_CUDA_SUFFIX}" rapids-download-wheels-from-github cpp)
 PYLIBCUDF_WHEELHOUSE=$(rapids-download-from-github "$(rapids-package-name "wheel_python" pylibcudf --stable --cuda "$RAPIDS_CUDA_VERSION")")
 
-function ensure_cublaslt_symlink()
+function ensure_so_symlink()
 {
-    rapids-logger "Ensure libcublasLt.so symlink exists"
-    python - <<'PY'
+    rapids-logger "Ensure unversioned .so symlink exists for: $*"
+    python - "$@" <<'PY'
+import sys
 import sysconfig
 from pathlib import Path
+
+sonames = sys.argv[1:]
+if not sonames:
+    raise SystemExit("At least one .so name must be provided")
+
+
+def symlink_name_for(soname):
+    prefix, separator, _ = soname.partition(".so.")
+    if separator:
+        return f"{prefix}.so"
+    if soname.endswith(".so"):
+        return soname
+    raise SystemExit(f"{soname} does not look like a shared object name")
+
 
 site_packages = {
     Path(path)
@@ -27,13 +42,13 @@ site_packages = {
 }
 
 for site_package in sorted(path for path in site_packages if path.is_dir()):
-    for soname in ("libcublasLt.so.13", "libcublasLt.so.12"):
+    for soname in sonames:
         matches = sorted(site_package.rglob(soname))
         if not matches:
             continue
 
         lib = matches[0]
-        symlink = lib.with_name("libcublasLt.so")
+        symlink = lib.with_name(symlink_name_for(soname))
 
         if symlink.is_symlink():
             symlink.unlink()
@@ -45,7 +60,7 @@ for site_package in sorted(path for path in site_packages if path.is_dir()):
         print(f"Created {symlink} -> {lib.name}")
         raise SystemExit(0)
 
-print("No libcublasLt.so.12 or libcublasLt.so.13 found in site-packages; skipping")
+print(f"No {' or '.join(sonames)} found in site-packages; skipping")
 PY
 }
 
@@ -74,9 +89,11 @@ rapids-pip-retry install \
     --constraint "${PIP_CONSTRAINT}" \
     "$(echo "${LIBCUDF_WHEELHOUSE}"/libcudf_"${RAPIDS_PY_CUDA_SUFFIX}"*.whl)" \
     "$(echo "${PYLIBCUDF_WHEELHOUSE}"/pylibcudf_"${RAPIDS_PY_CUDA_SUFFIX}"*.whl)[test]"\
-    "cuda-toolkit[cublas]"
+    "cuda-toolkit[cublas,nvrtc]"
 
-ensure_cublaslt_symlink
+ensure_so_symlink "libcublasLt.so.13" "libcublasLt.so.12"
+ensure_so_symlink "libcublas.so.13" "libcublas.so.12"
+ensure_so_symlink "libnvrtc.so.12" "libnvrtc.so.13"
 
 rapids-logger "pytest pylibcudf without optional dependencies"
 pushd python/pylibcudf/tests
@@ -105,7 +122,7 @@ rapids-pip-retry install \
     "$(echo "${LIBCUDF_WHEELHOUSE}"/libcudf_"${RAPIDS_PY_CUDA_SUFFIX}"*.whl)" \
     "$(echo "${PYLIBCUDF_WHEELHOUSE}"/pylibcudf_"${RAPIDS_PY_CUDA_SUFFIX}"*.whl)[test, pyarrow, numpy]"
 
-ensure_cublaslt_symlink
+ensure_so_symlink "libcublasLt.so.13" "libcublasLt.so.12"
 
 rapids-logger "pytest pylibcudf"
 pushd python/pylibcudf/tests
